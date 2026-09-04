@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Get started — FlowGuard</title>
+  <meta name="description" content="Create your FlowGuard account and understand your business finances." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="../css/design-system.css" />
+  <link rel="stylesheet" href="../css/motion.css" />
+  <link rel="stylesheet" href="../css/auth.css" />
+</head>
+<body class="auth-body">
+
+<div class="auth-left" aria-hidden="true">
+  <div class="auth-left-logo">
+    <div class="auth-left-logo-mark">FG</div>
+    FlowGuard
+  </div>
+  <div class="auth-left-content">
+    <div class="auth-presence-label">A CALMER START TO FINANCIAL CONTROL</div>
+    <div class="auth-left-quote">
+      Begin with the<br><em>truth</em> in your<br>financial data.
+    </div>
+    <div class="auth-left-caption">
+      FlowGuard asks only for the context it cannot derive, then guides you to import or connect the evidence your financial picture needs.
+    </div>
+    <div class="auth-state-rail"><span><b>01</b> Create your account</span><span><b>02</b> Configure risk preferences</span><span><b>03</b> Connect your data</span></div>
+  </div>
+</div>
+
+<!-- Right form panel -->
+<div class="auth-right">
+  <div class="auth-form-wrap">
+    <a href="/" class="auth-back">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Back to home
+    </a>
+
+    <h1 class="auth-headline">Let&rsquo;s get started.</h1>
+    <p class="auth-sub">Create your account. Your financial data connects next.</p>
+    <button class="auth-google-btn" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.8 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.5a4.7 4.7 0 0 1-2 3.1v2.5h3.2c1.9-1.8 3.1-4.4 3.1-7.4Z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.2-2.5c-.9.6-2 .9-3.5.9-2.6 0-4.8-1.7-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22Z"/><path fill="#FBBC05" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H3.1a10 10 0 0 0 0 9l3.3-2.6Z"/><path fill="#EA4335" d="M12 6c1.6 0 3 .5 4.1 1.6l3.1-3A10 10 0 0 0 3.1 7.5l3.3 2.6C7.2 7.7 9.4 6 12 6Z"/></svg>Continue with Google</button>
+    <div class="auth-social-divider"><span>or create with email</span></div>
+
+    <div class="auth-error-global" id="global-error" role="alert" aria-live="assertive"></div>
+
+    <form class="auth-form" id="signup-form" novalidate>
+      <div class="auth-field" id="field-name">
+        <label class="auth-label" for="name">Full name</label>
+        <input class="auth-input" type="text" id="name" name="name"
+               autocomplete="name" placeholder="Prem Ganatra" required />
+        <div class="auth-field-error" id="name-err">Please enter your name.</div>
+      </div>
+
+      <div class="auth-field" id="field-email">
+        <label class="auth-label" for="email">Work email</label>
+        <input class="auth-input" type="email" id="email" name="email"
+               autocomplete="email" placeholder="you@company.com" required />
+        <div class="auth-field-error" id="email-err">Please enter a valid email address.</div>
+      </div>
+
+      <div class="auth-field" id="field-password">
+        <label class="auth-label" for="password">Password</label>
+        <input class="auth-input" type="password" id="password" name="password"
+               autocomplete="new-password" placeholder="At least 8 characters" required minlength="8" />
+        <div class="auth-field-error" id="password-err">Password must be at least 8 characters.</div>
+      </div>
+
+      <button type="submit" class="auth-btn" id="submit-btn">Create account</button>
+    </form>
+
+    <div class="auth-footer-link">
+      Already have an account? <a href="login.html">Log in</a>
+    </div>
+
+    <div style="margin-top:24px;font-size:12px;color:#9B9894;text-align:center;line-height:1.6">
+      By creating an account, you agree that FlowGuard stores your manually entered
+      information with explicit source tracking. We never fabricate financial metrics.
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { getServerSession } from '../js/auth/session.js';
+
+const existingSession = await getServerSession();
+if (existingSession) window.location.replace(existingSession.onboardingComplete ? 'dashboard.html' : 'onboarding.html');
+
+const form   = document.getElementById('signup-form');
+const btn    = document.getElementById('submit-btn');
+const errBox = document.getElementById('global-error');
+
+function setFieldError(fieldId, msg) {
+  const wrap = document.getElementById(fieldId);
+  wrap.classList.toggle('has-error', !!msg);
+  if (msg) wrap.querySelector('.auth-field-error').textContent = msg;
+}
+
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const name     = form.name.value.trim();
+  const email    = form.email.value.trim();
+  const password = form.password.value;
+
+  let valid = true;
+  if (!name)                                { setFieldError('field-name', 'Please enter your name.'); valid = false; } else setFieldError('field-name', '');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setFieldError('field-email', 'Please enter a valid email address.'); valid = false; } else setFieldError('field-email', '');
+  if (password.length < 8)                  { setFieldError('field-password', 'Password must be at least 8 characters.'); valid = false; } else setFieldError('field-password', '');
+  if (!valid) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner-btn"></div> Creating account…';
+  errBox.style.display = 'none';
+  errBox.classList.remove('auth-confirmation-global');
+
+  await new Promise(r => setTimeout(r, 700));
+
+  const response = await fetch('/api/auth/signup', { method: 'POST', headers: { 'content-type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ name, email, password }) });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    errBox.textContent = result?.error?.code === 'FG_AUTH_RATE_LIMIT'
+      ? 'Supabase has temporarily rate-limited confirmation emails. Disable Confirm email for local development, then try again.'
+      : result?.error?.code === 'FG_EMAIL_ALREADY_REGISTERED'
+        ? 'An account already exists for this email. Log in, or remove the earlier unconfirmed test user in Supabase and sign up again.'
+      : 'Unable to create the account. Try a different email or check your Supabase email settings.';
+    errBox.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = 'Create account';
+    return;
+  }
+
+  btn.innerHTML = result.confirmationRequired ? 'Check your email to confirm' : '&#x2713; Account created';
+  if (result.confirmationRequired) {
+    errBox.textContent = `We sent a confirmation link to ${email}. Open it, then log in to begin your financial setup.`;
+    errBox.classList.add('auth-confirmation-global');
+    errBox.setAttribute('role', 'status');
+    errBox.style.display = 'block';
+    return;
+  }
+  setTimeout(() => { window.location.href = 'onboarding.html'; }, 600);
+});
+
+document.querySelector('.auth-google-btn')?.addEventListener('click', () => {
+  window.location.assign('/auth/google');
+});
+
+['field-name','field-email','field-password'].forEach(id => {
+  const inp = document.getElementById(id)?.querySelector('input');
+  if (inp) inp.addEventListener('input', () => setFieldError(id, ''));
+});
+</script>
+</body>
+</html>

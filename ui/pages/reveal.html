@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Financial Picture — FlowGuard</title>
+  <meta name="description" content="Your authoritative financial metrics are ready." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="../css/design-system.css" />
+  <link rel="stylesheet" href="../css/motion.css" />
+  <link rel="stylesheet" href="../css/reveal.css" />
+</head>
+<body class="reveal-body">
+
+<div class="reveal-container">
+  <div class="reveal-header">
+    <div class="reveal-eyebrow">Authoritative Calculation Complete</div>
+    <h1 class="reveal-title" id="reveal-org-title">Your financial control system is ready.</h1>
+    <p class="reveal-subtitle">
+      Now give FlowGuard something real to watch. Connect verified sources to unlock your financial picture.
+    </p>
+  </div>
+
+  <div class="reveal-grid">
+    <!-- 1. Available Cash -->
+    <div class="reveal-card" id="card-0">
+      <div class="reveal-card-header">
+        <div class="reveal-card-label">&#x26A1; Connect Razorpay</div>
+        <span class="badge" id="badge-0">NOT CONNECTED</span>
+      </div>
+      <div class="reveal-card-value no-data" id="val-0">Payments &amp; settlements</div>
+      <div class="reveal-card-footer">
+        <span id="src-0">Capture the money in motion</span>
+        <span>PENDING</span>
+      </div>
+    </div>
+
+    <!-- 2. 30-Day Forecast -->
+    <div class="reveal-card" id="card-1">
+      <div class="reveal-card-header">
+        <div class="reveal-card-label">&#x1F3E6; Connect Bank</div>
+        <span class="badge" id="badge-1">NOT CONNECTED</span>
+      </div>
+      <div class="reveal-card-value no-data" id="val-1">Cash &amp; reconciliation</div>
+      <div class="reveal-card-footer">
+        <span id="src-1">Verify the cash position</span>
+        <span>PENDING</span>
+      </div>
+    </div>
+
+    <!-- 3. Receivables -->
+    <div class="reveal-card" id="card-2">
+      <div class="reveal-card-header">
+        <div class="reveal-card-label">&#x1F4CB; Add Receivables</div>
+        <span class="badge" id="badge-2">NOT CONNECTED</span>
+      </div>
+      <div class="reveal-card-value no-data" id="val-2">Invoices &amp; expected cash</div>
+      <div class="reveal-card-footer">
+        <span id="src-2">See what is likely to arrive</span>
+        <span>PREDICTED</span>
+      </div>
+    </div>
+
+    <!-- 4. Obligations -->
+    <div class="reveal-card" id="card-3">
+      <div class="reveal-card-header">
+        <div class="reveal-card-label">&#x2713; Onboarding context</div>
+        <span class="badge" id="badge-3">DECLARED</span>
+      </div>
+      <div class="reveal-card-value no-data" id="val-3">Operating context saved</div>
+      <div class="reveal-card-footer">
+        <span id="src-3">Liquidity preference &amp; obligations</span>
+        <span>CONTEXT</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="reveal-alert-box" id="reveal-alert">
+    <div class="reveal-alert-icon">&#x1F6E1;</div>
+    <div>
+      <div class="reveal-alert-title" id="reveal-alert-heading">FlowGuard Risk Guardian Active</div>
+      <div class="reveal-alert-desc" id="reveal-alert-body">Your baseline liquidity buffer and obligation schedules are actively monitored.</div>
+    </div>
+  </div>
+
+  <div class="reveal-actions" id="reveal-actions">
+    <a href="dashboard.html" class="reveal-btn-primary" id="open-dashboard-btn">
+      Open Financial Control Center
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+</div>
+
+<!-- Legacy browser-storage controller intentionally disabled. The server-backed
+     reveal controller below is the authoritative onboarding handoff. -->
+<script type="application/flowguard-disabled">
+import { requireAuth } from '../js/auth/session.js';
+import { loadTenant } from '../js/tenant.js';
+import { computeMetrics } from '../js/dashboard/metrics.js';
+import { Provenance, provenanceBadgeClass, provenanceLabel } from '../js/provenance.js';
+import { CountUp } from '../js/motion/number.js';
+
+const session = requireAuth('../pages/login.html');
+if (!session) throw new Error('Not authenticated');
+
+const tenantId = session.tenantId;
+const tenant   = loadTenant(tenantId);
+const metrics  = computeMetrics(tenantId);
+const profile  = tenant?.profile ?? {};
+const cur      = profile.currency ?? 'INR';
+
+if (profile.organizationName) {
+  document.getElementById('reveal-org-title').textContent = `${profile.organizationName} Financial Snapshot`;
+}
+
+function fmt(val) {
+  if (val === null || val === undefined) return null;
+  return new Intl.NumberFormat('en-IN', { style: 'currency', currency: cur, maximumFractionDigits: 0 }).format(val);
+}
+
+const metricCards = [
+  { id: 0, metric: metrics.availableCash, label: 'Available Cash' },
+  { id: 1, metric: metrics.forecast30d, label: '30-Day Forecast' },
+  { id: 2, metric: metrics.receivables, label: 'Receivables' },
+  { id: 3, metric: metrics.upcomingObligations, label: 'Upcoming Obligations' }
+];
+
+async function revealSequence() {
+  for (const item of metricCards) {
+    const cardEl = document.getElementById(`card-${item.id}`);
+    const valEl  = document.getElementById(`val-${item.id}`);
+    const badgeEl= document.getElementById(`badge-${item.id}`);
+    const srcEl  = document.getElementById(`src-${item.id}`);
+
+    const m = item.metric;
+    const isReliable = m && m.reliable && m.value !== null;
+
+    badgeEl.className = `badge ${provenanceBadgeClass(m?.provenance ?? Provenance.PENDING)}`;
+    badgeEl.textContent = provenanceLabel(m?.provenance ?? Provenance.PENDING);
+    srcEl.textContent = m?.source || 'Pending connection';
+
+    if (isReliable) {
+      valEl.classList.remove('no-data');
+      CountUp(valEl, m.value, {
+        duration: 900,
+        format: (v) => fmt(v)
+      });
+    } else {
+      valEl.classList.add('no-data');
+      valEl.textContent = 'Not enough data yet';
+    }
+
+    cardEl.classList.add('revealed');
+    await new Promise(r => setTimeout(r, 450));
+  }
+
+  // Reveal alert box
+  const alertEl = document.getElementById('reveal-alert');
+  const risks = tenant?.initialAssessment?.risks ?? [];
+  if (risks.length > 0) {
+    document.getElementById('reveal-alert-heading').textContent = `We found ${risks.length} item${risks.length > 1 ? 's' : ''} worth your attention`;
+    document.getElementById('reveal-alert-body').textContent = risks[0].title;
+  }
+  alertEl.classList.add('revealed');
+  await new Promise(r => setTimeout(r, 400));
+
+  // Reveal CTA
+  document.getElementById('reveal-actions').classList.add('revealed');
+}
+
+revealSequence();
+</script>
+<script src="../js/onboarding/reveal-sequence.js"></script>
+</body>
+</html>

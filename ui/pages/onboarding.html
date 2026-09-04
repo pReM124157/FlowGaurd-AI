@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting to know your business — FlowGuard</title>
+  <meta name="description" content="Tell us about your business so FlowGuard can configure your financial control center." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="../css/design-system.css" />
+  <link rel="stylesheet" href="../css/motion.css" />
+  <link rel="stylesheet" href="../css/onboarding.css" />
+</head>
+<body class="ob-body">
+
+<div class="ob-field" aria-hidden="true">
+  <div class="ob-field-grid"></div>
+  <div class="ob-field-axis ob-field-axis-a"></div>
+  <div class="ob-field-axis ob-field-axis-b"></div>
+</div>
+
+<!-- Progress bar -->
+<div class="ob-progress-bar"><div class="ob-progress-fill" id="ob-progress"></div></div>
+
+<!-- Top bar -->
+<div class="ob-topbar">
+  <a href="/" class="ob-logo"><div class="ob-logo-mark">FG</div>FlowGuard</a>
+  <div class="ob-progress-meta">
+    <div class="ob-step-rail" aria-hidden="true"><i class="is-active"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="ob-step-counter" id="ob-step-counter" aria-live="polite">01 / 08</div>
+  </div>
+</div>
+
+<!-- Screens container -->
+<div class="ob-screens" id="ob-screens" aria-live="polite">
+
+  <!-- SCREEN 1: Business name -->
+  <div class="ob-screen active" data-step="1" role="group" aria-labelledby="q1">
+    <div class="ob-screen-inner">
+      <div class="ob-screen-label">Your Business</div>
+      <h2 class="ob-question" id="q1">What&rsquo;s your<br><em>business called?</em></h2>
+      <p class="ob-hint">We&rsquo;ll use this to personalise your dashboard.</p>
+      <input class="ob-text-input" type="text" id="org-name" placeholder="e.g. Prem Ventures" autocomplete="organization" maxlength="80" aria-labelledby="q1" />
+      <div class="ob-field-error" id="q1-err">Please enter your business name.</div>
+      <div class="ob-nav">
+        <div></div>
+        <button class="ob-next-btn" id="btn-1" type="button">Continue <span aria-hidden="true">&#x2192;</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: Business type -->
+  <div class="ob-screen" data-step="2" role="group" aria-labelledby="q2">
+    <div class="ob-screen-inner">
+      <div class="ob-screen-label">Business Type</div>
+      <h2 class="ob-question" id="q2">What does the<br><em>business do?</em></h2>
+      <p class="ob-hint">This helps us tune the right financial model for you.</p>
+      <div class="ob-choices" id="industry-choices" role="listbox" aria-multiselectable="false" aria-labelledby="q2">
+        <div class="ob-choice" data-value="ecommerce" role="option"><span class="ob-choice-icon">&#x1F6D2;</span><span class="ob-choice-label">E-commerce</span></div>
+        <div class="ob-choice" data-value="saas" role="option"><span class="ob-choice-icon">&#x1F4BB;</span><span class="ob-choice-label">SaaS</span></div>
+        <div class="ob-choice" data-value="marketplace" role="option"><span class="ob-choice-icon">&#x1F3EA;</span><span class="ob-choice-label">Marketplace</span></div>
+        <div class="ob-choice" data-value="services" role="option"><span class="ob-choice-icon">&#x1F91D;</span><span class="ob-choice-label">Professional Services</span></div>
+        <div class="ob-choice" data-value="retail" role="option"><span class="ob-choice-icon">&#x1F3EC;</span><span class="ob-choice-label">Retail</span></div>
+        <div class="ob-choice" data-value="manufacturing" role="option"><span class="ob-choice-icon">&#x1F527;</span><span class="ob-choice-label">Manufacturing</span></div>
+        <div class="ob-choice" data-value="other" role="option"><span class="ob-choice-icon">&#x1F4BC;</span><span class="ob-choice-label">Other</span></div>
+      </div>
+      <input class="ob-text-input" type="text" id="industry-other" placeholder="Describe your business type" style="display:none;margin-top:12px" maxlength="80" />
+      <div class="ob-field-error" id="q2-err">Please select your business type.</div>
+      <div class="ob-nav">
+        <button class="ob-back-btn" id="back-2">&#x2190; Back</button>
+        <button class="ob-next-btn" id="btn-2">Continue <span aria-hidden="true">&#x2192;</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: How money arrives -->
+  <div class="ob-screen" data-step="3" role="group" aria-labelledby="q3">
+    <div class="ob-screen-inner">
+      <div class="ob-screen-label">Revenue Sources</div>
+      <h2 class="ob-question" id="q3">How does money<br><em>reach you?</em></h2>
+      <p class="ob-hint">Select all that apply. This determines which connections we recommend.</p>
+      <div class="ob-choices" id="payment-choices" role="listbox" aria-multiselectable="true" aria-labelledby="q3">
+        <div class="ob-choice" data-value="razorpay" role="option"><span class="ob-choice-icon">&#x26A1;</span><span class="ob-choice-label">Razorpay</span></div>
+        <div class="ob-choice" data-value="bank_transfer" role="option"><span class="ob-choice-icon">&#x1F3E6;</span><span class="ob-choice-label">Bank Transfers</span></div>
+        <div class="ob-choice" data-value="invoices" role="option"><span class="ob-choice-icon">&#x1F4CB;</span><span class="ob-choice-label">Invoices</span></div>
+        <div class="ob-choice" data-value="stripe" role="option"><span class="ob-choice-icon">&#x1F4B3;</span><span class="ob-choice-label">Stripe</span></div>
+        <div class="ob-choice" data-value="cash" role="option"><span class="ob-choice-icon">&#x1F4B5;</span><span class="ob-choice-label">Cash</span></div>
+        <div class="ob-choice" data-value="other_gateways" role="option"><span class="ob-choice-icon">&#x1F517;</span><span class="ob-choice-label">Other Gateways</span></div>
+      </div>
+      <div class="ob-field-error" id="q3-err">Please select at least one option.</div>
+      <div class="ob-nav">
+        <button class="ob-back-btn" id="back-3">&#x2190; Back</button>
+        <button class="ob-next-btn" id="btn-3">Continue <span aria-hidden="true">&#x2192;</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 4: Cash pressure sources -->
+  <div class="ob-screen" data-step="4" role="group" aria-labelledby="q4">
+    <div class="ob-screen-inner">
+      <div class="ob-screen-label">Risk Configuration</div>
+      <h2 class="ob-question" id="q4">What usually creates<br><em>cash pressure?</em></h2>
+      <p class="ob-hint">Select all that apply. This tunes your alert sensitivity.</p>
+      <div class="ob-choices" id="pressure-choices" role="listbox" aria-multiselectable="true" aria-labelledby="q4">
+        <div class="ob-choice" data-value="late_payments" role="option"><span class="ob-choice-icon">&#x23F0;</span><span class="ob-choice-label">Late customer payments</span></div>
+        <div class="ob-choice" data-value="payroll" role="option"><span class="ob-choice-icon">&#x1F464;</span><span class="ob-choice-label">Payroll</span></div>
+        <div class="ob-choice" data-value="vendors" role="option"><span class="ob-choice-icon">&#x1F3ED;</span><span class="ob-choice-label">Vendor payments</span></div>
+        <div class="ob-choice" data-value="refunds" role="option"><span class="ob-choice-icon">&#x21A9;</span><span class="ob-choice-label">Refunds</span></div>
+        <div class="ob-choice" data-value="loan_repayments" role="option"><span class="ob-choice-icon">&#x1F4B8;</span><span class="ob-choice-label">Loan repayments</span></div>
+        <div class="ob-choice" data-value="taxes" role="option"><span class="ob-choice-icon">&#x1F4C4;</span><span class="ob-choice-label">Taxes &amp; GST</span></div>
+        <div class="ob-choice" data-value="seasonal" role="option"><span class="ob-choice-icon">&#x1F4C8;</span><span class="ob-choice-label">Seasonal revenue</span></div>
+        <div class="ob-choice" data-value="not_sure" role="option"><span class="ob-choice-icon">&#x1F914;</span><span class="ob-choice-label">Not sure yet</span></div>
+      </div>
+      <div class="ob-nav">
+        <button class="ob-back-btn" id="back-4">&#x2190; Back</button>
+        <button class="ob-next-btn" id="btn-4">Continue <span aria-hidden="true">&#x2192;</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 5: Liquidity buffer -->
+  <div class="ob-screen" data-step="5" role="group" aria-labelledby="q5">
+    <div class="ob-screen-inner">
+      <div class="ob-screen-label">Risk Threshold</div>
+      <h2 class="ob-question" id="q5">What&rsquo;s the minimum cash<br><em>you&rsquo;d feel comfortable with?</em></h2>
+      <p class="ob-hint">
+        FlowGuard uses this as your <em>liquidity buffer</em> when evaluating risk.
+        This is stored as a declared value and used to configure your risk model &mdash; not as financial data.
+      </p>
+      <div class="ob-currency-wrap">
+        <span class="ob-currency-prefix">&#x20B9;</span>
+        <input class="ob-text-input has-prefix" type="number" id="liquidity-buffer" placeholder="e.g. 300000" min="0" step="10000" aria-labelledby="q5" />
+      </div>
+      <p class="ob-hint" style="margin-top:18px">If you know it, add your approximate cash currently available. This remains <em>declared</em> until a bank verifies it.</p>
+      <div class="ob-currency-wrap">
+        <span class="ob-currency-prefix">&#x20B9;</span>
+        <input class="ob-text-input has-prefix" type="number" id="current-cash" placeholder="Approximate cash currently available (optional)" min="0" step="10000" aria-label="Approximate cash currently available" />
+      </div>
+      <div class="ob-field-error" id="q5-err">Please enter a valid amount.</div>
+      <div class="ob-nav">
+        <button class="ob-back-btn" id="back-5">&#x2190; Back</button>
+        <div style="display:flex;gap:12px;align-items:center">
+          <button class="ob-skip-btn" id="skip-5">Set later</button>
+          <button class="ob-next-btn" id="btn-5">Continue <span aria-hidden="true">&#x2192;</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 6: Obligations -->
+  <div class="ob-screen" data-step="6" role="group" aria-labelledby="q6">
+    <div class="ob-screen-inner">
+      <div class="ob-screen-label">Recurring Obligations</div>
+      <h2 class="ob-question" id="q6">Tell us about your<br><em>recurring payments.</em></h2>
+      <p class="ob-hint">These help build your forward cash model. All values are <em>declared</em> and not treated as financial data.</p>
+
+      <div class="ob-toggle-row">
+        <span>Do you run payroll?</span>
+        <label class="ob-toggle" aria-label="Toggle payroll">
+          <input type="checkbox" id="has-payroll" />
+          <span class="ob-slider"></span>
+        </label>
+      </div>
+      <div id="payroll-detail" style="display:none;margin-bottom:16px">
+        <div class="ob-currency-wrap" style="margin-bottom:12px">
+          <span class="ob-currency-prefix">&#x20B9;</span>
+          <input class="ob-text-input has-prefix" type="number" id="payroll-amount" placeholder="Monthly payroll amount" min="0" step="1000" />
+        </div>
+        <div class="ob-choices compact" id="payroll-schedule" role="listbox" aria-label="Payroll schedule">
+          <div class="ob-choice" data-value="weekly" role="option"><span class="ob-choice-label">Weekly</span></div>
+          <div class="ob-choice" data-value="bi-weekly" role="option"><span class="ob-choice-label">Bi-weekly</span></div>
+          <div class="ob-choice" data-value="monthly" role="option"><span class="ob-choice-label">Monthly</span></div>
+        </div>
+      </div>
+
+      <div class="ob-toggle-row">
+        <span>Recurring vendor payments?</span>
+        <label class="ob-toggle" aria-label="Toggle vendor payments">
+          <input type="checkbox" id="has-vendors" />
+          <span class="ob-slider"></span>
+        </label>
+      </div>
+      <div id="vendor-detail" style="display:none;margin-bottom:16px">
+        <div class="ob-currency-wrap">
+          <span class="ob-currency-prefix">&#x20B9;</span>
+          <input class="ob-text-input has-prefix" type="number" id="vendor-amount" placeholder="Monthly vendor payments" min="0" step="1000" />
+        </div>
+      </div>
+
+      <div class="ob-toggle-row">
+        <span>Any EMI or loan repayments?</span>
+        <label class="ob-toggle" aria-label="Toggle loan repayments">
+          <input type="checkbox" id="has-loans" />
+          <span class="ob-slider"></span>
+        </label>
+      </div>
+      <div id="loan-detail" style="display:none;margin-bottom:16px">
+        <div class="ob-currency-wrap">
+          <span class="ob-currency-prefix">&#x20B9;</span>
+          <input class="ob-text-input has-prefix" type="number" id="loan-amount" placeholder="Monthly EMI total" min="0" step="1000" />
+        </div>
+      </div>
+
+      <div class="ob-nav">
+        <button class="ob-back-btn" id="back-6">&#x2190; Back</button>
+        <button class="ob-next-btn" id="btn-6">Continue <span aria-hidden="true">&#x2192;</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 7: Payment terms -->
+  <div class="ob-screen" data-step="7" role="group" aria-labelledby="q7">
+    <div class="ob-screen-inner">
+      <div class="ob-screen-label">Receivables</div>
+      <h2 class="ob-question" id="q7">How do customers<br><em>typically pay you?</em></h2>
+      <p class="ob-hint">Used for initial receivables assumptions. Connected invoice data supersedes this when available.</p>
+      <div class="ob-choices list" id="terms-choices" role="listbox" aria-labelledby="q7">
+        <div class="ob-choice" data-value="0" role="option"><span class="ob-choice-label">Immediately on purchase</span></div>
+        <div class="ob-choice" data-value="7" role="option"><span class="ob-choice-label">Within 7 days</span></div>
+        <div class="ob-choice" data-value="15" role="option"><span class="ob-choice-label">Net 15 days</span></div>
+        <div class="ob-choice" data-value="30" role="option"><span class="ob-choice-label">Net 30 days</span></div>
+        <div class="ob-choice" data-value="45" role="option"><span class="ob-choice-label">Net 45 days</span></div>
+        <div class="ob-choice" data-value="60" role="option"><span class="ob-choice-label">Net 60+ days</span></div>
+        <div class="ob-choice" data-value="varies" role="option"><span class="ob-choice-label">Varies significantly</span></div>
+      </div>
+      <div class="ob-field-error" id="q7-err">Please select your payment terms.</div>
+      <div class="ob-nav">
+        <button class="ob-back-btn" id="back-7">&#x2190; Back</button>
+        <button class="ob-next-btn" id="btn-7">Continue <span aria-hidden="true">&#x2192;</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 8: Connect data -->
+  <div class="ob-screen" data-step="8" role="group" aria-labelledby="q8">
+    <div class="ob-screen-inner">
+      <div class="ob-screen-label">Connect the Numbers</div>
+      <h2 class="ob-question" id="q8">Now let&rsquo;s connect<br><em>the real data.</em></h2>
+      <p class="ob-hint">Your answers configured FlowGuard&rsquo;s risk model. Now connect your financial sources for live metrics.</p>
+
+      <div class="ob-connection-grid" id="conn-grid" role="list">
+        <div class="ob-conn-card" id="conn-razorpay" data-source="razorpay" role="listitem">
+          <div class="ob-conn-icon">&#x26A1;</div>
+          <div class="ob-conn-name">Razorpay</div>
+          <div class="ob-conn-desc">Connect your Razorpay account for payment data</div>
+          <div class="ob-conn-status"></div>
+        </div>
+        <div class="ob-conn-card" id="conn-bank" data-source="bank" role="listitem">
+          <div class="ob-conn-icon">&#x1F3E6;</div>
+          <div class="ob-conn-name">Bank Statement</div>
+          <div class="ob-conn-desc">Upload a bank statement CSV or PDF</div>
+          <div class="ob-conn-status"></div>
+        </div>
+        <div class="ob-conn-card" id="conn-invoices" data-source="invoices" role="listitem">
+          <div class="ob-conn-icon">&#x1F4CB;</div>
+          <div class="ob-conn-name">Receivables</div>
+          <div class="ob-conn-desc">Import outstanding invoices</div>
+          <div class="ob-conn-status"></div>
+        </div>
+        <div class="ob-conn-card" id="conn-expenses" data-source="expenses" role="listitem">
+          <div class="ob-conn-icon">&#x1F4E4;</div>
+          <div class="ob-conn-name">Obligations</div>
+          <div class="ob-conn-desc">Add recurring expenses and vendors</div>
+          <div class="ob-conn-status"></div>
+        </div>
+      </div>
+
+      <div class="ob-demo-link">
+        <a href="demo.html">Skip to Explore Demo Company instead &rarr;</a>
+      </div>
+
+      <div class="ob-nav" style="border-top:none;padding-top:0">
+        <button class="ob-back-btn" id="back-8">&#x2190; Back</button>
+        <button class="ob-next-btn" id="btn-8">Build my financial picture &rarr;</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /ob-screens -->
+
+<script type="application/flowguard-disabled">
+import { requireAuth, isOnboardingComplete, markOnboardingComplete, getServerSession } from '../js/auth/session.js';
+import { getOrCreateTenant, loadTenant, saveTenant, OnboardingState, advanceOnboarding, updateProfile, updateRiskPreferences, connectDataSource } from '../js/tenant.js';
+import { Provenance } from '../js/provenance.js';
+
+// ── Guard ──────────────────────────────────────────────────────
+const session = await getServerSession() || requireAuth('../pages/login.html');
+if (!session) throw new Error('Not authenticated');
+
+if (session.onboardingComplete || isOnboardingComplete(session.tenantId)) {
+  window.location.replace('dashboard.html');
+  throw new Error('Onboarding complete');
+}
+
+let tenant = getOrCreateTenant(session.tenantId);
+const TOTAL_STEPS = 8;
+let currentStep = 1;
+
+// Track answers in memory (committed on advance)
+const answers = {
+  organizationName: tenant.profile.organizationName || '',
+  industry: tenant.profile.industry || '',
+  paymentSources: [],
+  cashPressures: [],
+  minimumLiquidityBuffer: tenant.profile.minimumLiquidityBuffer || null,
+  payroll: { enabled: false, amount: 0, schedule: '' },
+  vendors: { enabled: false, amount: 0 },
+  loans: { enabled: false, amount: 0 },
+  receivableTermsDays: 30,
+};
+
+// ── UI helpers ─────────────────────────────────────────────────
+function goToStep(n, direction = 'forward') {
+  const current = document.querySelector('.ob-screen.active');
+  const next    = document.querySelector(`.ob-screen[data-step="${n}"]`);
+  if (!next || !current) return;
+
+  current.classList.remove('active');
+  current.classList.add(direction === 'forward' ? 'exit-left' : 'exit-right');
+  setTimeout(() => { current.classList.remove('exit-left','exit-right'); }, 500);
+
+  next.style.transform = direction === 'forward' ? 'translateX(60px)' : 'translateX(-60px)';
+  next.style.opacity = '0';
+  requestAnimationFrame(() => {
+    next.classList.add('active');
+    next.style.transform = '';
+    next.style.opacity = '';
+  });
+
+  currentStep = n;
+  document.getElementById('ob-step-counter').textContent = `Step ${n} of ${TOTAL_STEPS}`;
+  document.getElementById('ob-progress').style.width = `${((n-1)/(TOTAL_STEPS-1))*100}%`;
+
+  // Focus first input
+  setTimeout(() => {
+    const inp = next.querySelector('input, button.ob-next-btn');
+    if (inp) inp.focus();
+  }, 520);
+}
+
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = msg || el.textContent; el.classList.add('show'); }
+}
+function hideErr(id) { document.getElementById(id)?.classList.remove('show'); }
+
+// ── Single-select choices ──────────────────────────────────────
+function initSingleSelect(containerId, onSelect) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.addEventListener('click', e => {
+    const choice = e.target.closest('.ob-choice');
+    if (!choice) return;
+    container.querySelectorAll('.ob-choice').forEach(c => {
+      c.classList.remove('selected');
+      c.setAttribute('aria-selected', 'false');
+    });
+    choice.classList.add('selected');
+    choice.setAttribute('aria-selected', 'true');
+    onSelect(choice.dataset.value);
+  });
+}
+
+// ── Multi-select choices ───────────────────────────────────────
+function initMultiSelect(containerId, target) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.addEventListener('click', e => {
+    const choice = e.target.closest('.ob-choice');
+    if (!choice) return;
+    const val = choice.dataset.value;
+    choice.classList.toggle('selected');
+    const isSelected = choice.classList.contains('selected');
+    choice.setAttribute('aria-selected', String(isSelected));
+    if (isSelected) { if (!target.includes(val)) target.push(val); }
+    else { const i = target.indexOf(val); if (i > -1) target.splice(i, 1); }
+  });
+}
+
+// ── Screen 1 setup ─────────────────────────────────────────────
+const orgInput = document.getElementById('org-name');
+if (answers.organizationName) orgInput.value = answers.organizationName;
+orgInput.addEventListener('input', () => {
+  answers.organizationName = orgInput.value.trim();
+  hideErr('q1-err');
+});
+document.getElementById('btn-1').addEventListener('click', () => {
+  if (!answers.organizationName) { showErr('q1-err'); orgInput.focus(); return; }
+  updateProfile(tenant, { organizationName: answers.organizationName }, localStorage);
+  tenant = loadTenant(session.tenantId);
+  goToStep(2);
+});
+orgInput.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-1').click(); });
+
+// ── Screen 2 setup ─────────────────────────────────────────────
+initSingleSelect('industry-choices', val => {
+  answers.industry = val;
+  hideErr('q2-err');
+  document.getElementById('industry-other').style.display = val === 'other' ? 'block' : 'none';
+});
+document.getElementById('btn-2').addEventListener('click', () => {
+  const ind = answers.industry === 'other' ? document.getElementById('industry-other').value.trim() : answers.industry;
+  if (!ind) { showErr('q2-err'); return; }
+  answers.industry = ind;
+  updateProfile(tenant, { industry: ind }, localStorage);
+  tenant = loadTenant(session.tenantId);
+  goToStep(3);
+});
+document.getElementById('back-2').addEventListener('click', () => goToStep(1, 'back'));
+
+// ── Screen 3 setup ─────────────────────────────────────────────
+initMultiSelect('payment-choices', answers.paymentSources);
+document.getElementById('btn-3').addEventListener('click', () => {
+  if (!answers.paymentSources.length) { showErr('q3-err', 'Please select at least one option.'); return; }
+  hideErr('q3-err');
+  goToStep(4);
+});
+document.getElementById('back-3').addEventListener('click', () => goToStep(2, 'back'));
+
+// ── Screen 4 setup ─────────────────────────────────────────────
+initMultiSelect('pressure-choices', answers.cashPressures);
+document.getElementById('btn-4').addEventListener('click', () => { goToStep(5); });
+document.getElementById('back-4').addEventListener('click', () => goToStep(3, 'back'));
+
+// ── Screen 5 setup ─────────────────────────────────────────────
+const bufferInput = document.getElementById('liquidity-buffer');
+bufferInput.addEventListener('input', () => {
+  answers.minimumLiquidityBuffer = parseFloat(bufferInput.value) || null;
+  hideErr('q5-err');
+});
+document.getElementById('btn-5').addEventListener('click', () => {
+  if (bufferInput.value && parseFloat(bufferInput.value) < 0) { showErr('q5-err'); return; }
+  if (answers.minimumLiquidityBuffer !== null) {
+    updateProfile(tenant, { minimumLiquidityBuffer: answers.minimumLiquidityBuffer }, localStorage);
+    tenant = loadTenant(session.tenantId);
+  }
+  goToStep(6);
+});
+document.getElementById('skip-5').addEventListener('click', () => goToStep(6));
+document.getElementById('back-5').addEventListener('click', () => goToStep(4, 'back'));
+
+// ── Screen 6 setup ─────────────────────────────────────────────
+function toggle(checkId, detailId) {
+  document.getElementById(checkId).addEventListener('change', function() {
+    document.getElementById(detailId).style.display = this.checked ? 'block' : 'none';
+  });
+}
+toggle('has-payroll', 'payroll-detail');
+toggle('has-vendors', 'vendor-detail');
+toggle('has-loans',   'loan-detail');
+initSingleSelect('payroll-schedule', val => { answers.payroll.schedule = val; });
+
+document.getElementById('btn-6').addEventListener('click', () => {
+  answers.payroll.enabled = document.getElementById('has-payroll').checked;
+  answers.payroll.amount  = parseFloat(document.getElementById('payroll-amount').value) || 0;
+  answers.vendors.enabled = document.getElementById('has-vendors').checked;
+  answers.vendors.amount  = parseFloat(document.getElementById('vendor-amount').value) || 0;
+  answers.loans.enabled   = document.getElementById('has-loans').checked;
+  answers.loans.amount    = parseFloat(document.getElementById('loan-amount').value) || 0;
+
+  const recurringObligations = [];
+  if (answers.payroll.enabled && answers.payroll.amount) recurringObligations.push({ type: 'payroll', amount: answers.payroll.amount, schedule: answers.payroll.schedule || 'monthly' });
+  if (answers.vendors.enabled && answers.vendors.amount) recurringObligations.push({ type: 'vendor', amount: answers.vendors.amount, schedule: 'monthly' });
+  if (answers.loans.enabled && answers.loans.amount)     recurringObligations.push({ type: 'loan', amount: answers.loans.amount, schedule: 'monthly' });
+
+  updateProfile(tenant, {
+    payrollAmount: answers.payroll.amount,
+    payrollSchedule: answers.payroll.schedule,
+    recurringObligations,
+  }, localStorage);
+  tenant = loadTenant(session.tenantId);
+  goToStep(7);
+});
+document.getElementById('back-6').addEventListener('click', () => goToStep(5, 'back'));
+
+// ── Screen 7 setup ─────────────────────────────────────────────
+initSingleSelect('terms-choices', val => {
+  answers.receivableTermsDays = val === 'varies' ? 30 : parseInt(val);
+  hideErr('q7-err');
+});
+document.getElementById('btn-7').addEventListener('click', () => {
+  if (!document.querySelector('#terms-choices .ob-choice.selected')) { showErr('q7-err'); return; }
+  updateProfile(tenant, { receivableTermsDays: answers.receivableTermsDays }, localStorage);
+  // Save risk preferences
+  updateRiskPreferences(tenant, {
+    riskTolerance: 'moderate',
+    forecastHorizonDays: 30,
+    cashReserveTargetMultiplier: 2,
+    alertSensitivity: 'medium',
+    alertsEnabled: {
+      cashShortfall: true, payrollRisk: true, lateReceivable: true,
+      settlementMismatch: true, refundSpike: true, unexpectedExpense: true,
+    },
+  }, localStorage);
+  tenant = loadTenant(session.tenantId);
+  goToStep(8);
+});
+document.getElementById('back-7').addEventListener('click', () => goToStep(6, 'back'));
+
+// ── Screen 8 setup ─────────────────────────────────────────────
+document.querySelectorAll('.ob-conn-card').forEach(card => {
+  card.addEventListener('click', function() {
+    // Provider selection is handled by the external controller. Do not create
+    // a fake local "demo" connection merely because a card was clicked.
+  });
+});
+
+document.getElementById('back-8').addEventListener('click', () => goToStep(7, 'back'));
+// The CSP-safe controller loaded after this module persists the declared
+// profile to the server and owns the final handoff to calculate.html.
+
+// ── Restore from partial state ─────────────────────────────────
+if (tenant.profile.organizationName) answers.organizationName = tenant.profile.organizationName;
+if (tenant.profile.industry)         answers.industry = tenant.profile.industry;
+</script>
+<script src="../js/onboarding/first-step-fallback.js"></script>
+</body>
+</html>

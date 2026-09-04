@@ -1,0 +1,89 @@
+/* ================================================================
+   FlowGuard — Motion System
+   Apple-precision timing × Spring physics × Reduced-motion safe
+   ================================================================ */
+
+:root {
+  --motion-instant:    80ms;
+  --motion-fast:      160ms;
+  --motion-standard:  300ms;
+  --motion-deliberate:500ms;
+  --motion-editorial: 700ms;
+  --motion-cinematic: 1100ms;
+
+  --ease-spring:    cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out:       cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out:    cubic-bezier(0.4, 0, 0.6, 1);
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Always visible by default, enhanced with CSS entrance ──── */
+.fade-up {
+  opacity: 1;
+  transform: translateY(0);
+  animation: fadeUpEntrance 800ms var(--ease-editorial) backwards;
+}
+
+.fade-in-anim {
+  opacity: 1;
+  animation: fadeInEntrance 900ms var(--ease-smooth) backwards;
+}
+
+@keyframes fadeUpEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInEntrance {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── Staggers ──────────────────────────────────────────────── */
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 80ms; }
+.stagger > *:nth-child(3) { animation-delay: 160ms; }
+.stagger > *:nth-child(4) { animation-delay: 240ms; }
+.stagger > *:nth-child(5) { animation-delay: 320ms; }
+
+/* ── Page transition overlay ───────────────────────────────── */
+#page-transition {
+  position: fixed;
+  inset: 0;
+  background: #0A0A0B;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--motion-standard) var(--ease-smooth);
+}
+#page-transition.active { opacity: 1; pointer-events: all; }
+
+/* ── Number transition ─────────────────────────────────────── */
+.num-transition {
+  display: inline-block;
+  transition: opacity var(--motion-fast) var(--ease-smooth);
+}
+.num-transition.updating { opacity: 0.4; }
+
+/* ── Reduced motion ────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

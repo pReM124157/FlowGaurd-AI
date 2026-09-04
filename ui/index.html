@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlowGuard — Autonomous Financial Intelligence</title>
+  <meta name="description" content="FlowGuard continuously understands where your money is, where it is going, and what could put your business at risk before it becomes an emergency." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="css/motion.css" />
+  <link rel="stylesheet" href="css/landing.css" />
+</head>
+<body class="fullbleed-body">
+  <div class="grain-overlay" aria-hidden="true"></div>
+
+  <!-- FIXED FLOATING HEADER (Apple Glass) -->
+  <header class="fg-header" role="banner">
+    <a href="/" class="fg-brand" aria-label="FlowGuard home">
+      <div class="fg-brand-shield" aria-hidden="true">FG</div>
+      FlowGuard
+    </a>
+
+    <nav aria-label="Primary">
+      <ul class="fg-nav-menu">
+        <li><a href="#reconciliation-film-track">Reconciliation</a></li>
+        <li><a href="#revenue-split-stage">Revenue Gap</a></li>
+        <li><a href="#forecast-curve-stage">30-Day Radar</a></li>
+        <li><a href="#plan-stage">Autonomous Plan</a></li>
+        <li><a href="#live-product-stage">Live Product</a></li>
+      </ul>
+    </nav>
+
+    <div class="fg-nav-cta-group">
+      <a href="pages/login.html" class="fg-btn-ghost">Log in</a>
+      <a href="pages/signup.html" class="fg-btn-pill">Start with FlowGuard &rarr;</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- SCENE 1: HERO -->
+    <section id="hero-stage" class="stage-section" aria-labelledby="hero-title">
+      <div class="hero-ambient-grid" aria-hidden="true"></div>
+      <div class="hero-top-meta">
+        <div class="hero-badge-tag">
+          <span class="hero-badge-dot"></span>
+          Gated onboarding · Zero fabricated metrics
+        </div>
+        <div class="hero-live-ticker">
+          <span>AUTHORITY MODE</span>
+          <span class="ticker-value">CONNECT DATA TO ACTIVATE</span>
+        </div>
+      </div>
+
+      <div class="hero-headline-wrap">
+        <h1 class="hero-title-giant" id="hero-title">
+          <span class="hero-title-line">Know the problem</span>
+          <span class="hero-title-line text-gradient">before it becomes one.</span>
+        </h1>
+      </div>
+
+      <div class="hero-sub-row">
+        <p class="hero-desc-large">
+          FlowGuard continuously understands where your money is, where it is going,
+          and what could put your business at risk &mdash; without showing a single fake live metric.
+        </p>
+        <div class="hero-actions-large">
+          <a href="pages/signup.html" class="hero-btn-main">
+            Start with FlowGuard
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <a href="pages/demo.html" class="hero-btn-secondary">Explore Demo Company</a>
+        </div>
+      </div>
+
+      <div class="hero-product-dock" aria-label="FlowGuard financial control preview">
+        <div class="dock-glass-topline">
+          <span>First-run readiness audit</span>
+          <strong id="hero-readiness-status">AWAITING RELIABLE SOURCE</strong>
+        </div>
+        <div class="dock-kpi-row">
+          <div class="dock-kpi">
+            <span class="dock-label">Available cash</span>
+            <strong>Not enough data</strong>
+            <i class="dock-badge pending">PENDING</i>
+          </div>
+          <div class="dock-kpi">
+            <span class="dock-label">Payroll exposure</span>
+            <strong>Configure guardrail</strong>
+            <i class="dock-badge declared">USER_DECLARED</i>
+          </div>
+          <div class="dock-kpi">
+            <span class="dock-label">30-day radar</span>
+            <strong>Valid after import</strong>
+            <i class="dock-badge pending">PENDING</i>
+          </div>
+        </div>
+        <div class="dock-flow-strip">
+          <span>Business Profile</span>
+          <b></b>
+          <span>Risk Preferences</span>
+          <b></b>
+          <span>Data Validation</span>
+          <b></b>
+          <span>First Assessment</span>
+        </div>
+      </div>
+
+      <div class="hero-proof-row" aria-label="Product guarantees">
+        <span>Server-side onboarding gate</span>
+        <span>Explicit demo tenant only</span>
+        <span>Actual vs declared provenance</span>
+        <span>Readiness before dashboard</span>
+      </div>
+
+      <a class="hero-scroll-cue" href="#reconciliation-film-track" aria-label="Scroll to see a payment traced">
+        <span>Trace a payment</span>
+        <i aria-hidden="true"></i>
+      </a>
+
+      <!-- CONTINUOUS FULL BLEED GRAPH TRAJECTORY -->
+      <div class="hero-stage-canvas-wrap" aria-hidden="true">
+        <div class="trajectory-caption">
+          <span>Liquidity trajectory</span>
+          <strong>Signal becomes actionable before the buffer breaks</strong>
+        </div>
+        <svg id="hero-edge-svg" viewBox="0 0 1440 220" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="heroCurveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#12785B" />
+              <stop offset="45%" stop-color="#12785B" />
+              <stop offset="65%" stop-color="#C88612" />
+              <stop offset="100%" stop-color="#D93829" />
+            </linearGradient>
+          </defs>
+          <line x1="0" y1="170" x2="1440" y2="170" stroke="rgba(12,11,10,0.06)" stroke-width="1" stroke-dasharray="6,6" />
+          <text x="24" y="162" fill="#ACA89F" font-family="var(--font-sans)" font-size="11" font-weight="600">LIQUIDITY THRESHOLD BUFFER</text>
+          <path id="hero-main-curve" d="M0,70 C360,60 540,85 720,95 C900,105 1080,170 1440,190" fill="none" stroke="url(#heroCurveGrad)" stroke-width="3.5" stroke-linecap="round" />
+        </svg>
+
+      </div>
+    </section>
+
+    <!-- SCENE 2: REBUILD FROM ZERO — 100VW × 100SVH CINEMATIC TRANSACTION RAIL FILM -->
+    <div id="reconciliation-film-track">
+      <div class="film-sticky-viewport">
+        <!-- Top Metadata -->
+        <div class="recon-top-eyebrow">
+          <span>02 / RECONCILIATION</span>
+          <span>DETERMINISTIC TRANSACTION TELEMETRY</span>
+        </div>
+
+        <!-- Opening Giant Statement -->
+        <div class="recon-hero-opening" id="recon-hero-title">
+          <div class="recon-opening-title">
+            <span class="recon-title-line recon-title-money">YOUR MONEY</span>
+            <span class="recon-title-line recon-title-move">DOESN’T MOVE</span>
+            <span class="recon-title-line recon-title-step">IN ONE STEP.</span>
+          </div>
+        </div>
+
+        <!-- Continuous SVG Rail & Nodes -->
+        <div class="recon-rail-container" id="recon-rail-group">
+          <svg id="money-flow-svg-canvas" viewBox="0 0 1440 260" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="railGlowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#12785B" />
+                <stop offset="60%" stop-color="#26C296" />
+                <stop offset="85%" stop-color="#C88612" />
+                <stop offset="100%" stop-color="#D93829" />
+              </linearGradient>
+            </defs>
+            <path class="recon-trail recon-trail-one" d="M 40,130 C 360,78 576,182 792,117 C 1008,65 1224,169 1400,130" fill="none" />
+            <path class="recon-trail recon-trail-two" d="M 20,164 C 300,118 612,212 810,145 C 1050,76 1242,202 1420,156" fill="none" />
+            <path class="recon-trail recon-trail-three" d="M 0,98 C 292,38 564,144 780,88 C 1030,18 1208,132 1440,94" fill="none" />
+            <path id="money-flow-svg-path" d="M 40,130 C 360,78 576,182 792,117 C 1008,65 1224,169 1400,130" fill="none" stroke="url(#railGlowGrad)" stroke-width="3" />
+            <path id="recon-expected-path" d="M 1000,100 C 1140,55 1280,80 1400,104" fill="none" stroke="#26C296" stroke-width="3" />
+            <path id="recon-actual-path" d="M 1000,100 C 1140,182 1280,198 1400,168" fill="none" stroke="#FF5442" stroke-width="3" />
+          </svg>
+        </div>
+
+        <!-- The Moving Money Packet -->
+        <div class="recon-floating-packet" id="recon-money-packet">
+          <div class="recon-packet-halo"></div>
+          <div class="recon-amount-billboard" id="recon-main-amount-val">&#x20B9;50,000</div>
+          <div class="recon-status-subtitle" id="recon-status-subtitle">PAYMENT CAPTURED</div>
+        </div>
+
+        <!-- Detached Fragments -->
+        <div class="detached-fragment" id="recon-fee-fragment">
+          <div class="fragment-val">&minus;&#x20B9;1,000</div>
+          <div class="fragment-label">GATEWAY FEE (2%)</div>
+        </div>
+
+        <div class="detached-fragment" id="recon-tax-fragment">
+          <div class="fragment-val">&minus;&#x20B9;180</div>
+          <div class="fragment-label">TAX WITHHOLDING</div>
+        </div>
+
+        <!-- The ₹600 Moment (Variance Emerges Center-Screen) -->
+        <div class="recon-mismatch-climax-wrap" id="recon-mismatch-climax">
+          <div class="climax-number-giant" id="recon-mismatch-val">&#x20B9;600</div>
+          <div class="climax-tag-line">MISMATCH DETECTED &middot; VARIANCE ISOLATED</div>
+          <div style="margin-top:14px;font-size:15px;color:var(--text-dark-primary);font-weight:600">
+            Expected &#x20B9;48,820 &nbsp;&middot;&nbsp; Actual Credit &#x20B9;48,220
+          </div>
+        </div>
+
+        <!-- The uncluttered final frame. This is separate from the kinetic
+             mismatch moment so the final state never stacks duplicate values. -->
+        <div class="recon-final-state" id="recon-final-state" aria-live="polite">
+          <div class="recon-final-amount">&#x20B9;600</div>
+          <div class="recon-final-kicker">Settlement variance detected</div>
+          <div class="recon-final-detail">Expected &#x20B9;48,820 <span>&middot;</span> Actual &#x20B9;48,220</div>
+          <p>FlowGuard traced the variance to the bank settlement batch.</p>
+        </div>
+        <div class="recon-resolution" id="recon-resolution" aria-live="polite">
+          <span>FlowGuard traced the variance to</span>
+          <strong>Bank settlement<br />batch.</strong>
+        </div>
+
+        <!-- FlowGuard Precision Scanning Laser -->
+        <div class="recon-scan-laser-beam" id="recon-scan-laser"></div>
+        <div class="recon-radar" id="recon-radar" aria-hidden="true"><span></span><span></span><i></i></div>
+        <div class="recon-broken-segment" id="recon-broken-segment">BANK SETTLEMENT BATCH · ₹600 UNMATCHED</div>
+
+        <!-- Lineage Breakdown -->
+        <div class="recon-lineage-grid" id="recon-lineage-tree">
+          <div class="lineage-node-item">
+            <div class="lineage-node-label">Payment Captured</div>
+            <div class="lineage-node-val" style="color:var(--accent-glow)">&#x20B9;50,000</div>
+          </div>
+          <div class="lineage-arrow">&rarr;</div>
+          <div class="lineage-node-item">
+            <div class="lineage-node-label">Gateway Fee</div>
+            <div class="lineage-node-val" style="color:var(--risk-glow)">&minus;&#x20B9;1,000</div>
+          </div>
+          <div class="lineage-arrow">&rarr;</div>
+          <div class="lineage-node-item">
+            <div class="lineage-node-label">Tax Withholding</div>
+            <div class="lineage-node-val" style="color:var(--risk-glow)">&minus;&#x20B9;180</div>
+          </div>
+          <div class="lineage-arrow">&rarr;</div>
+          <div class="lineage-node-item">
+            <div class="lineage-node-label">Expected Settlement</div>
+            <div class="lineage-node-val">&#x20B9;48,820</div>
+          </div>
+          <div class="lineage-arrow">&rarr;</div>
+          <div class="lineage-node-item">
+            <div class="lineage-node-label">Actual Bank Credit</div>
+            <div class="lineage-node-val" style="color:var(--risk-glow)">&#x20B9;48,220</div>
+          </div>
+          <div class="lineage-arrow">&rarr;</div>
+          <div class="lineage-node-item">
+            <div class="lineage-node-label">Discrepancy Isolated</div>
+            <div class="lineage-node-val" style="color:var(--risk-glow)">&#x20B9;600</div>
+          </div>
+        </div>
+
+        <!-- Final Financial Truth Copy -->
+        <div class="recon-bottom-final-copy" id="recon-final-copy">
+          <h3 class="final-truth-h3">Every rupee should have a reason.</h3>
+          <p class="final-truth-p">
+            FlowGuard traces payment &rarr; deductions &rarr; settlement &rarr; bank credit and surfaces discrepancies automatically.<br />
+            <strong style="color:var(--accent-glow)">&#x20B9;600 discrepancy identified before manual reconciliation.</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 3: REVENUE BREAKDOWN -->
+    <section id="revenue-split-stage" class="stage-section dark-stage" aria-labelledby="rev-split-title">
+      <div class="revenue-label-caps">The Fundamental Financial Gap</div>
+      <div id="giant-rev-num" class="revenue-hero-metric">&#x20B9;42.7L</div>
+      <div class="revenue-label-caps">BOOKED REVENUE</div>
+
+      <div class="stream-separation-row">
+        <div class="stream-box" id="rev-box-1">
+          <div class="stream-box-label">Settled in Bank</div>
+          <div class="stream-box-val">&#x20B9;31.2L</div>
+        </div>
+        <div class="stream-box" id="rev-box-2">
+          <div class="stream-box-label">Outstanding Receivables</div>
+          <div class="stream-box-val">&#x20B9;8.4L</div>
+        </div>
+        <div class="stream-box" id="rev-box-3">
+          <div class="stream-box-label">Pending Settlements</div>
+          <div class="stream-box-val">&#x20B9;4.7L</div>
+        </div>
+        <div class="stream-box spendable-box" id="rev-final-spendable-box">
+          <div class="stream-box-label" style="color:var(--accent-glow)">Spendable Position</div>
+          <div class="stream-box-val" style="color:var(--accent-glow)">&#x20B9;25.3L</div>
+        </div>
+      </div>
+
+      <div class="revenue-punchline-quote">
+        Revenue tells you what you earned.<br />
+        <strong>FlowGuard tells you what you can actually spend.</strong>
+      </div>
+    </section>
+
+    <!-- SCENE 4: 30-DAY FORWARD CASH RADAR -->
+    <section id="forecast-curve-stage" class="stage-section" aria-labelledby="forecast-title">
+      <div class="forecast-scene-meta"><span>04 / Forward Cash Radar</span><span>DEMO SCENARIO · PROJECTED STATES</span></div>
+      <div class="forecast-title-row">
+        <h2 id="forecast-title">Risk has a<br /><span>rhythm.</span></h2>
+        <p>Before cash becomes a crisis, it appears as a sequence: a due date, a late invoice, a narrowing decision window.</p>
+      </div>
+
+      <div class="forecast-kinetic-stage" aria-label="Illustrative 30-day risk sequence">
+        <div class="forecast-kinetic-topline"><span>30 days, compressed into one decision moment</span><strong>THE WINDOW IS MOVING</strong></div>
+        <div class="forecast-day-ribbon">
+          <article class="forecast-beat beat-now"><span class="beat-index">00</span><span class="beat-label">TODAY</span><strong>Cash source<br />verified</strong><i>ACTUAL</i></article>
+          <article class="forecast-beat"><span class="beat-index">05</span><span class="beat-label">DAY FIVE</span><strong>Payroll enters<br />the window</strong><i>USER_DECLARED</i></article>
+          <article class="forecast-beat"><span class="beat-index">10</span><span class="beat-label">DAY TEN</span><strong>Obligations<br />converge</strong><i>PENDING</i></article>
+          <article class="forecast-beat"><span class="beat-index">17</span><span class="beat-label">DAY SEVENTEEN</span><strong>Receivable timing<br />widens</strong><i>PREDICTED</i></article>
+          <article class="forecast-beat beat-risk"><span class="beat-index">22</span><span class="beat-label">DAY TWENTY TWO</span><strong>Buffer breach<br />visible</strong><i>FORECAST</i></article>
+        </div>
+        <div class="forecast-day-needle" aria-hidden="true"><span></span><b>NOW</b></div>
+        <div class="forecast-kinetic-bottomline"><span>FLOWGUARD DOES NOT PREDICT A NUMBER.</span><strong>IT GIVES YOU TIME TO CHANGE THE OUTCOME.</strong></div>
+      </div>
+    </section>
+
+    <!-- SCENE 5: OPTIMIZER & INTERACTIVE COMPARISON -->
+    <div id="plan-film-track">
+    <section id="plan-stage" class="stage-section dark-stage" aria-labelledby="plan-title">
+      <div class="plan-scene-meta"><span>05 / Decision intelligence</span><span>DEMO SCENARIO · RECOMMENDATIONS ONLY</span></div>
+      <div class="plan-title-block"><p>One alert. A choice before consequences.</p><h2 id="plan-title">Move the outcome.<br /><em>Not the money.</em></h2></div>
+      <div class="decision-field" aria-label="Illustrative decision sequence">
+        <div class="decision-route route-risk"><span>WITHOUT A DECISION</span><strong>BREACH</strong><p>Day 22 · minimum buffer is projected to break.</p></div>
+        <div class="decision-transfer" aria-hidden="true"><span class="transfer-dot"></span><span class="transfer-line"></span><span class="transfer-dot"></span></div>
+        <div class="decision-route route-solve"><span>WITH FLOWGUARD'S PLAN</span><strong>SOLVENT</strong><p>Three recommendations preserve the operating buffer.</p></div>
+        <div class="decision-actions">
+          <div class="decision-action"><b>01</b><span>Prioritize collection</span><small>Improve timing</small></div>
+          <div class="decision-action"><b>02</b><span>Reschedule what is eligible</span><small>Preserve buffer</small></div>
+          <div class="decision-action"><b>03</b><span>Keep cash operating</span><small>₹0 external borrowing</small></div>
+        </div>
+      </div>
+    </section>
+    </div>
+
+    <!-- SCENE 6: FULL-SCREEN PRODUCT TAKEOVER -->
+    <section id="live-product-stage" class="stage-section dark-stage" aria-labelledby="product-title">
+      <div id="product-takeover-frame" class="full-product-mock-frame">
+        <div class="product-command-topline"><span>FLOWGUARD / DEMO COMPANY</span><span id="prod-live-status-pill">SIMULATION READY</span></div>
+        <div class="product-command-grid">
+          <div class="product-command-copy"><p>Ask the cash<br /><em>before you spend it.</em></p><span>Controller recommendations use the authoritative demo engines. No money moves from this interface.</span></div>
+          <div class="product-answer-stage">
+            <div class="product-question">Can I spend <strong>₹3 lakh</strong> on marketing next week?</div>
+            <div class="product-answer"><span>FLOWGUARD ANSWER</span><strong>Not safely.</strong><p>Wait for verified settlement or keep discretionary spend inside the recommended range.</p></div>
+            <div class="product-runway"><span>NOW</span><i></i><b>SAFE RANGE</b><i></i><span>DAY 30</span></div>
+          </div>
+        </div>
+        <div class="product-signal-row"><span>AVAILABLE CASH <strong id="prod-live-cash-val">₹8.24L</strong><i>ACTUAL</i></span><span>RECEIVABLES <strong>₹14.2L</strong><i>PREDICTED</i></span><span>RISK WINDOW <strong>DAY 22</strong><i>FORECAST</i></span></div>
+        <div class="product-command-actions"><button class="btn-sim-action btn-pos" id="prod-live-settle-btn">Simulate verified settlement</button><button class="btn-sim-action btn-neg" id="prod-live-expense-btn">Simulate emergency expense</button><span>DEMO CONTROLS</span></div>
+      </div>
+    </section>
+
+    <!-- SCENE 7: PHILOSOPHY & FINAL CTA -->
+    <section id="philosophy-monument-stage" class="stage-section dark-stage-2" aria-label="Philosophy">
+      <div class="monument-words-stack">
+        <div class="monument-line">Most finance software records what happened.</div>
+        <div class="monument-line highlight">FlowGuard watches what is forming.</div>
+        <div class="monument-line" style="font-family:var(--font-sans);font-size:clamp(14px,1.6vw,20px);color:var(--accent-glow);letter-spacing:0.08em;font-weight:700;margin-top:16px">
+          UNDERSTAND &middot; PREDICT &middot; ACT
+        </div>
+      </div>
+    </section>
+
+    <section id="final-hero-stage" class="stage-section dark-stage" aria-labelledby="final-title">
+      <h2 class="final-giant-statement" id="final-title">
+        Give your business<br />
+        more time to act.
+      </h2>
+      <p class="final-sub-statement">
+        Connect your financial data and let FlowGuard build your first authoritative
+        financial control center &mdash; powered strictly by your real numbers.
+      </p>
+
+      <div class="final-cta-pair">
+        <a href="pages/signup.html" class="hero-btn-main" style="background:#FAFAF8;color:#0C0B0A !important">
+          Get started with FlowGuard &rarr;
+        </a>
+        <a href="pages/demo.html" class="hero-btn-secondary" style="color:#FAFAF8;border-color:rgba(255,255,255,0.2)">
+          Explore Demo Company
+        </a>
+      </div>
+
+      <footer class="fg-footer-full" role="contentinfo">
+        <div>FlowGuard &middot; Institutional Cash Flow Intelligence</div>
+        <div>Tenant Isolated &middot; Zero Fabricated Numbers &middot; Provenance Verified</div>
+        <div>&copy; 2024 FlowGuard</div>
+      </footer>
+    </section>
+  </main>
+
+  <!-- EXTERNAL SCRIPT MODULE (CSP COMPLIANT) -->
+  <script type="module" src="js/landing/main.js"></script>
+</body>
+</html>

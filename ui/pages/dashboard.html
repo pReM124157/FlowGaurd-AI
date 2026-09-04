@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FlowGuard — Financial Control Center</title>
+  <link rel="stylesheet" href="../css/design-system.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
+</head>
+<body class="control-body">
+  <aside class="control-rail" aria-label="Product navigation">
+    <a class="control-logo" href="/"><span>◈</span> FlowGuard</a>
+    <nav>
+      <p>CONTROL CENTER</p>
+      <a class="active" href="dashboard.html">Overview</a><a href="cash.html">Cash</a><a href="forecast.html">Forecast</a><a href="receivables.html">Receivables</a><a href="reconciliation.html">Reconciliation</a><a href="scenarios.html">Scenarios</a><a href="connections.html">Connections</a>
+      <p>INTELLIGENCE</p>
+      <a href="risks.html">Risks</a><a href="ask-flowguard.html">Ask FlowGuard</a>
+    </nav>
+    <div class="account-control">
+      <button class="account-button" id="account-menu-trigger" aria-expanded="false" aria-controls="account-menu"><span id="account-initial">F</span><b id="account-name">FlowGuard</b><small id="account-meta">Owner · Account menu</small></button>
+      <div class="account-menu" id="account-menu" hidden role="menu">
+        <button type="button" id="account-details-button" role="menuitem">Account details</button>
+        <button type="button" id="logout-button" role="menuitem">Sign out</button>
+      </div>
+    </div>
+  </aside>
+  <main class="control-main">
+    <header class="control-topbar"><span class="live-dot" id="control-status">FINANCIAL READINESS</span><span id="freshness">Checking data freshness...</span></header>
+    <section class="control-hero">
+      <div class="hero-copy">
+        <div class="hero-eyebrow"><span id="greeting">Good afternoon.</span><span>OVERVIEW / 01</span></div>
+        <h1 id="condition">Build your financial picture from proof.</h1>
+        <p id="subcondition">Connect verified financial sources to turn your operating context into an authoritative picture.</p>
+        <div class="hero-actions"><a class="hero-action" href="connections.html"><span>Connect a source</span><b aria-hidden="true">→</b></a><button class="hero-edit" id="edit-financial-inputs" type="button">Edit financial inputs</button></div>
+      </div>
+      <div class="readiness-art" aria-hidden="true">
+        <span class="art-kicker">FLOWGUARD READINESS</span>
+        <strong>01</strong>
+        <div class="art-rule"></div>
+        <div class="art-captions"><span>CONTEXT</span><span>SOURCES</span><span>ASSESSMENT</span></div>
+        <i class="art-marker marker-one"></i><i class="art-marker marker-two"></i><i class="art-marker marker-three"></i>
+      </div>
+    </section>
+    <section class="control-metrics" aria-label="Financial overview">
+      <article><span>AVAILABLE CASH</span><strong id="available-cash">Not enough data</strong><small id="available-cash-note">No declared or verified cash balance</small></article>
+      <article><span id="forecast-label">30-DAY POSITION</span><strong id="forecast-position">Not enough data</strong><small id="forecast-position-note">Needs a declared or verified starting cash balance</small></article>
+      <article><span id="runway-label">RUNWAY</span><strong id="runway">Not enough data</strong><small id="runway-note">Never inferred from missing data</small></article>
+    </section>
+    <section class="position-panel" id="forecast">
+      <div class="position-copyblock"><p class="section-kicker">EVIDENCE RUNWAY</p><h2 id="position-heading">Start with the operating model you declared.</h2><p class="muted" id="position-copy">Connect a source to progressively verify cash, payments, and receivables - without double-counting what you already told us.</p></div>
+      <div class="evidence-runway" aria-label="Financial evidence readiness">
+        <div class="evidence-track" aria-hidden="true"><span></span><i></i><i></i><i></i></div>
+        <div class="evidence-steps">
+          <div class="evidence-step declared"><b>01</b><span>Operating context</span><small>DECLARED</small></div>
+          <div class="evidence-step"><b>02</b><span>Cash source</span><small>AWAITING</small></div>
+          <div class="evidence-step"><b>03</b><span>Payments and receivables</span><small>OPTIONAL</small></div>
+        </div>
+      </div>
+      <a class="outline-action" href="connections.html"><span>Connect a verified source</span><b aria-hidden="true">→</b></a>
+    </section>
+    <section class="attention-section" id="attention"><div class="section-heading"><p class="section-kicker">WHAT NEEDS ATTENTION</p><h2>Nothing urgent yet.</h2></div><div id="attention-list" class="attention-list"><p class="empty-copy">FlowGuard will rank only verified risks here—never invented alerts.</p></div></section>
+    <section class="ask-panel" id="ask-flowguard"><p class="section-kicker">ASK FLOWGUARD</p><h2>Ask about your financial reality.</h2><p>Answers are grounded in verified ledger tools. If data is missing, FlowGuard will say so.</p><form id="ask-form"><input id="ask-input" maxlength="500" placeholder="Why will my cash fall next Thursday?" aria-label="Ask FlowGuard"/><button>Ask <span>↑</span></button></form><div class="ai-answer" id="ai-answer" hidden></div></section>
+  </main>
+  <dialog class="account-dialog" id="account-dialog" aria-labelledby="account-dialog-title">
+    <div class="account-dialog-header"><p class="section-kicker">ACCOUNT</p><button type="button" id="account-dialog-close" aria-label="Close account details">Close</button></div>
+    <h2 id="account-dialog-title">Your FlowGuard account</h2>
+    <dl><div><dt>Email</dt><dd id="account-email">Loading…</dd></div><div><dt>Organization</dt><dd id="account-organization">Loading…</dd></div><div><dt>Role</dt><dd id="account-role">Owner</dd></div></dl>
+  </dialog>
+  <dialog class="financial-input-dialog" id="financial-input-dialog" aria-labelledby="financial-input-title">
+    <form id="financial-input-form">
+      <div class="financial-dialog-header"><p class="section-kicker">DECLARED OPERATING MODEL</p><button type="button" id="financial-input-close">Close</button></div>
+      <h2 id="financial-input-title">Edit financial inputs</h2>
+      <p class="financial-dialog-copy">These values are marked as declared until a connected source verifies them.</p>
+      <div class="financial-input-grid">
+        <label>Business name<input id="edit-organization-name" required></label>
+        <label>Industry<input id="edit-industry" required></label>
+        <label>Approximate cash available<input id="edit-current-cash" inputmode="decimal" placeholder="Leave blank if unknown"></label>
+        <label>Monthly payroll<input id="edit-payroll" inputmode="decimal" required></label>
+        <label>Minimum cash buffer<input id="edit-buffer" inputmode="decimal" required></label>
+        <label>Customer payment terms (days)<input id="edit-terms" type="number" min="0" required></label>
+      </div>
+      <p class="financial-input-status" id="financial-input-status"></p>
+      <button class="financial-save" type="submit">Save and recalculate</button>
+    </form>
+  </dialog>
+  <script src="../js/dashboard/control-center.js"></script>
+</body>
+</html>

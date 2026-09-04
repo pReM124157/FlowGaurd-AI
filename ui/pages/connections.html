@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Connections — FlowGuard</title>
+    <link rel="stylesheet" href="../css/workspace.css">
+    <link rel="stylesheet" href="../css/connections.css">
+  </head>
+  <body class="control-body">
+    <main class="control-main connections-main">
+      <a class="control-logo" href="dashboard.html">◈ FlowGuard</a>
+      <header>
+        <p class="workspace-index">FLOWGUARD / 07 / CONNECTIONS</p>
+        <h1>Connect what<br>you trust.</h1>
+        <p class="lede">Only live sources can change your financial picture.</p>
+      </header>
+      <section class="connection-grid">
+        <article class="connection-card live-card">
+          <p class="workspace-index">01 / PAYMENTS</p><h2>Razorpay</h2>
+          <p>Read captured payments and refunds directly from Razorpay. Credentials remain server-side.</p>
+          <label><input id="razorpay-consent" type="checkbox"> I consent to importing payment data.</label>
+          <button id="razorpay-sync">Sync Razorpay Test Mode</button>
+          <small id="razorpay-status">No Razorpay payment data has been imported.</small>
+        </article>
+        <article class="connection-card unavailable-card">
+          <p class="workspace-index">02 / CASH</p><h2>Bank feed</h2>
+          <p>Live balances and transactions require an approved banking-data provider. FlowGuard will never ask for your bank password.</p>
+          <div class="connection-status"><span></span> Provider not configured</div>
+          <button class="configure-provider" type="button" data-kind="BANK">Configure bank feed</button>
+          <small id="bank-status">Choose a provider to start secure setup.</small>
+        </article>
+        <article class="connection-card unavailable-card">
+          <p class="workspace-index">03 / RECEIVABLES</p><h2>Accounting ledger</h2>
+          <p>Invoices and receivables need a live connection to your accounting system, such as Zoho Books, Tally, or QuickBooks.</p>
+          <div class="connection-status"><span></span> Provider not configured</div>
+          <button class="configure-provider" type="button" data-kind="ACCOUNTING">Configure accounting</button>
+          <small id="accounting-status">Choose a provider to start secure setup.</small>
+        </article>
+      </section>
+      <section class="webhook-panel">
+        <div><p class="workspace-index">WEBHOOK DELIVERY</p><h2>Keep Razorpay current.</h2><p>After deployment, add the endpoint below in Razorpay Dashboard → Webhooks. Subscribe to payment captured and refund events.</p></div>
+        <div class="webhook-code"><code id="webhook-url"></code><button id="copy-webhook" type="button">Copy endpoint</button><small id="webhook-note"></small></div>
+      </section>
+    </main>
+    <dialog id="provider-dialog" class="provider-dialog">
+      <form method="dialog" id="provider-form">
+        <button class="dialog-close" id="provider-dialog-close" type="button" aria-label="Close">×</button>
+        <p class="workspace-index" id="provider-kind-label"></p>
+        <h2 id="provider-title">Configure a provider</h2>
+        <p id="provider-copy"></p>
+        <label for="provider-select">Provider</label>
+        <select id="provider-select" required></select>
+        <p class="dialog-note">Credentials, API secrets, and bank passwords are never entered here. The selected provider is configured only in FlowGuard’s server environment.</p>
+        <button class="dialog-submit" value="submit">Request secure setup</button>
+      </form>
+    </dialog>
+    <script src="../js/connections.js"></script>
+  </body>
+</html>

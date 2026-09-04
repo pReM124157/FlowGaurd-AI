@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log in — FlowGuard</title>
+  <meta name="description" content="Log in to your FlowGuard financial control center." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="../css/design-system.css" />
+  <link rel="stylesheet" href="../css/motion.css" />
+  <link rel="stylesheet" href="../css/auth.css" />
+</head>
+<body class="auth-body">
+
+<div class="auth-left" aria-hidden="true">
+  <div class="auth-left-logo">
+    <div class="auth-left-logo-mark">FG</div>
+    FlowGuard
+  </div>
+  <div class="auth-left-content">
+    <div class="auth-presence-label">FINANCIAL CONTROL, WITHOUT THE GUESSWORK</div>
+    <div class="auth-left-quote">
+      See what is<br><em>forming</em> before<br>it becomes urgent.
+    </div>
+    <div class="auth-left-caption">
+      Your account begins with a guided financial setup. Connect a source, define your guardrails, then see only what your data can support.
+    </div>
+    <div class="auth-state-rail"><span><b>01</b> Identify your business</span><span><b>02</b> Connect reliable data</span><span><b>03</b> See your first assessment</span></div>
+  </div>
+</div>
+
+<!-- Right form panel -->
+<div class="auth-right">
+  <div class="auth-form-wrap fade-up" style="opacity:1;transform:none">
+    <a href="/" class="auth-back">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <path d="M13 8H3M7 4L3 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Back to home
+    </a>
+
+    <h1 class="auth-headline">Welcome back.</h1>
+    <p class="auth-sub">Log in to your FlowGuard account.</p>
+    <button class="auth-google-btn" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.8 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.5a4.7 4.7 0 0 1-2 3.1v2.5h3.2c1.9-1.8 3.1-4.4 3.1-7.4Z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.7-2.4l-3.2-2.5c-.9.6-2 .9-3.5.9-2.6 0-4.8-1.7-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22Z"/><path fill="#FBBC05" d="M6.4 13.9a6 6 0 0 1 0-3.8V7.5H3.1a10 10 0 0 0 0 9l3.3-2.6Z"/><path fill="#EA4335" d="M12 6c1.6 0 3 .5 4.1 1.6l3.1-3A10 10 0 0 0 3.1 7.5l3.3 2.6C7.2 7.7 9.4 6 12 6Z"/></svg>Continue with Google</button>
+    <div class="auth-social-divider"><span>or use email</span></div>
+
+    <div class="auth-error-global" id="global-error" role="alert" aria-live="assertive"></div>
+
+    <form class="auth-form" id="login-form" novalidate>
+      <div class="auth-field" id="field-email">
+        <label class="auth-label" for="email">Work email</label>
+        <input class="auth-input" type="email" id="email" name="email"
+               autocomplete="email" placeholder="you@company.com" required />
+        <div class="auth-field-error" id="email-err">Please enter a valid email address.</div>
+      </div>
+
+      <div class="auth-field" id="field-password">
+        <label class="auth-label" for="password">Password</label>
+        <input class="auth-input" type="password" id="password" name="password"
+               autocomplete="current-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" required />
+        <div class="auth-field-error" id="password-err">Password is required.</div>
+      </div>
+
+      <div class="auth-forgot">
+        <a href="#" tabindex="-1">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="auth-btn" id="submit-btn">Log in</button>
+    </form>
+
+    <div class="auth-footer-link">
+      New to FlowGuard? <a href="signup.html">Create an account</a>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { getServerSession } from '../js/auth/session.js';
+
+const oauthError = new URLSearchParams(window.location.search).get('error');
+if (oauthError) {
+  const message = oauthError === 'google_denied' ? 'Google sign-in was cancelled. You can try again whenever you are ready.' : 'Google sign-in could not be completed. Please try again.';
+  document.getElementById('global-error').textContent = message;
+  document.getElementById('global-error').style.display = 'block';
+}
+
+// A returning user resumes only if onboarding is incomplete. READY users go
+// straight to their server-authorized dashboard.
+const existingSession = await getServerSession();
+if (existingSession) window.location.replace(existingSession.onboardingComplete ? 'dashboard.html' : 'onboarding.html');
+
+const form   = document.getElementById('login-form');
+const btn    = document.getElementById('submit-btn');
+const errBox = document.getElementById('global-error');
+
+function setFieldError(fieldId, show) {
+  document.getElementById(fieldId).classList.toggle('has-error', show);
+}
+
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const email    = form.email.value.trim();
+  const password = form.password.value;
+
+  let valid = true;
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setFieldError('field-email', true); valid = false; } else setFieldError('field-email', false);
+  if (!password) { setFieldError('field-password', true); valid = false; } else setFieldError('field-password', false);
+  if (!valid) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner-btn"></div> Signing in…';
+  errBox.style.display = 'none';
+
+  await new Promise(r => setTimeout(r, 600)); // feels deliberate
+
+  let response;
+  let result = {};
+  try {
+    response = await fetch('/api/auth/login', { method: 'POST', headers: { 'content-type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ email, password }) });
+    result = await response.json().catch(() => ({}));
+  } catch {
+    errBox.textContent = 'FlowGuard could not reach the sign-in service. Please try again.';
+    errBox.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = 'Log in';
+    return;
+  }
+  if (!response.ok) {
+    errBox.textContent = result?.error?.code === 'FG_EMAIL_NOT_CONFIRMED'
+      ? 'Confirm your email, then sign in to continue.'
+      : result?.error?.code === 'FG_TENANT_PROVISIONING_FAILED'
+        ? 'Your account was verified, but its workspace could not be prepared. Please try again.'
+        : 'Unable to sign in with those credentials.';
+    errBox.style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = 'Log in';
+    return;
+  }
+
+  btn.innerHTML = '&#x2713; Welcome back';
+  setTimeout(() => {
+    window.location.href = result.destination || 'onboarding.html';
+  }, 500);
+});
+
+document.querySelector('.auth-google-btn')?.addEventListener('click', () => {
+  window.location.assign('/auth/google');
+});
+
+// Real-time clear errors
+form.email.addEventListener('input', () => setFieldError('field-email', false));
+form.password.addEventListener('input', () => setFieldError('field-password', false));
+</script>
+</body>
+</html>
