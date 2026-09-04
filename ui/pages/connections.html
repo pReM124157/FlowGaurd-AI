@@ -18,10 +18,11 @@
       <section class="connection-grid">
         <article class="connection-card live-card">
           <p class="workspace-index">01 / PAYMENTS</p><h2>Razorpay</h2>
-          <p>Read captured payments and refunds directly from Razorpay. Credentials remain server-side.</p>
+          <p>Read captured payments and refunds directly from Razorpay. Approval happens with Razorpay; credentials remain server-side.</p>
           <label><input id="razorpay-consent" type="checkbox"> I consent to importing payment data.</label>
-          <button id="razorpay-sync">Sync Razorpay Test Mode</button>
-          <small id="razorpay-status">No Razorpay payment data has been imported.</small>
+          <button id="razorpay-connect" type="button">Connect Razorpay</button>
+          <button id="razorpay-sync" type="button" hidden>Sync latest payments</button>
+          <small id="razorpay-status" aria-live="polite">Checking connection status...</small>
         </article>
         <article class="connection-card unavailable-card">
           <p class="workspace-index">02 / CASH</p><h2>Bank feed</h2>
@@ -39,8 +40,8 @@
         </article>
       </section>
       <section class="webhook-panel">
-        <div><p class="workspace-index">WEBHOOK DELIVERY</p><h2>Keep Razorpay current.</h2><p>After deployment, add the endpoint below in Razorpay Dashboard → Webhooks. Subscribe to payment captured and refund events.</p></div>
-        <div class="webhook-code"><code id="webhook-url"></code><button id="copy-webhook" type="button">Copy endpoint</button><small id="webhook-note"></small></div>
+        <div><p class="workspace-index">WEBHOOK DELIVERY</p><h2>Keep Razorpay current.</h2><p>Add this endpoint in Razorpay Dashboard → Webhooks and subscribe to payment captured and refund events.</p></div>
+        <div class="webhook-code"><code id="webhook-url"></code><button id="copy-webhook" type="button">Copy endpoint</button><small id="webhook-note" aria-live="polite"></small></div>
       </section>
     </main>
     <dialog id="provider-dialog" class="provider-dialog">

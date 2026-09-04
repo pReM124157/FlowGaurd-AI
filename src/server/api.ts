@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { answerFinanceQuestion, type FinancialEvidenceContext } from "../agent/controller.ts";
 import { explainWithLlm } from "../agent/llm-router.ts";
 import { authenticate, demoLoginCookie, liveFirstRunCookie, requirePermission, type Permission, type Role } from "./auth.ts";
@@ -10,9 +11,9 @@ import { metricsSnapshot, metricsText, recordMetric } from "./metrics.ts";
 import { buildOnboardingSummary, finalizeInitialCalculation, getOnboardingRecord, isDashboardReady, restoreOnboardingRecord, runReadinessAudit, saveBusinessProfile, saveDataConnections, saveRiskPreferences, updateBusinessProfile, type OnboardingRecord } from "./onboarding.ts";
 import { checkRateLimit } from "./rate-limit.ts";
 import { clearOAuthStateCookie, clearSessionCookie, createGoogleAuthorization, finishGoogleAuthorization, invalidateOAuthSession, markOAuthOnboardingComplete, oauthStateCookie, sessionCookie } from "./google-oauth.ts";
-import { clearSupabaseSessionCookie, createSupabaseGoogleAuthorization, exchangeSupabaseGoogleCode, getSupabaseOnboardingProgress, getSupabaseOnboardingStage, provisionSupabaseTenant, saveSupabaseOnboardingProgress, signInWithSupabase, signUpWithSupabase, supabaseAuthConfigured, supabaseSessionCookie } from "./supabase-auth.ts";
+import { clearSupabaseSessionCookie, createSupabaseGoogleAuthorization, exchangeSupabaseGoogleCode, getRazorpayOAuthConnection, getRazorpayOAuthStatus, getSupabaseOnboardingProgress, getSupabaseOnboardingStage, markRazorpayOAuthSynced, provisionSupabaseTenant, saveRazorpayOAuthConnection, saveSupabaseOnboardingProgress, signInWithSupabase, signUpWithSupabase, supabaseAuthConfigured, supabaseServiceConfigured, supabaseSessionCookie } from "./supabase-auth.ts";
 import { buildDeclaredBaseline } from "./declared-baseline.ts";
-import { fetchRazorpayPayments, paymentsToCanonicalEvents, razorpayDirectConfig, verifyRazorpayWebhook, webhookOrganizationId, webhookToCanonicalEvents, type RazorpayWebhook } from "./razorpay-live.ts";
+import { createOAuthState, createRazorpayAuthorizationUrl, exchangeRazorpayAuthorizationCode, fetchRazorpayOAuthPayments, fetchRazorpayPayments, paymentsToCanonicalEvents, razorpayConfig, razorpayDirectConfig, verifyRazorpayWebhook, webhookOrganizationId, webhookToCanonicalEvents, type RazorpayWebhook } from "./razorpay-live.ts";
 
 type JsonValue = null | string | number | boolean | JsonValue[] | { [key: string]: JsonValue };
 
@@ -115,6 +116,22 @@ async function handleRazorpayWebhook(request: Request, correlationId: string): P
 }
 
 async function handleAuth(request: Request, url: URL): Promise<Response> {
+  if (url.pathname === "/auth/razorpay/callback" && request.method === "GET") {
+    const config = razorpayConfig();
+    const user = await authenticate(request);
+    const cookies = parseCookieHeader(request.headers.get("cookie") ?? "");
+    const state = verifyRazorpayOAuthState(cookies.fg_razorpay_oauth, url.searchParams.get("state"));
+    if (!config || !supabaseServiceConfigured() || !user || !state || state.organizationId !== user.organizationId || state.userId !== user.userId) {
+      return redirect("/pages/connections.html?razorpay=connection_failed", { "set-cookie": clearTemporaryCookie("fg_razorpay_oauth") });
+    }
+    const code = url.searchParams.get("code");
+    if (url.searchParams.get("error") || !code) return redirect("/pages/connections.html?razorpay=denied", { "set-cookie": clearTemporaryCookie("fg_razorpay_oauth") });
+    const token = await exchangeRazorpayAuthorizationCode(config, code);
+    await saveRazorpayOAuthConnection({ organizationId: user.organizationId, accountId: token.accountId, accessToken: token.accessToken, refreshToken: token.refreshToken, accessTokenExpiresAt: token.accessTokenExpiresAt, refreshTokenExpiresAt: token.refreshTokenExpiresAt, userId: user.userId });
+    ensureOrganization(user.organizationId, user.displayName ?? user.email.split("@")[0]);
+    recordAudit({ organizationId: user.organizationId, userId: user.userId, action: "razorpay_oauth_connected", entityType: "RazorpayConnection", entityId: token.accountId, correlationId: "oauth_callback" });
+    return redirect("/pages/connections.html?razorpay=connected", { "set-cookie": clearTemporaryCookie("fg_razorpay_oauth") });
+  }
   if (url.pathname === "/auth/google" && request.method === "GET") {
     if (!supabaseAuthConfigured()) {
       const authorization = createGoogleAuthorization();
@@ -214,6 +231,33 @@ async function handleApi(request: Request, url: URL, correlationId: string): Pro
   }
 
   switch (key) {
+    case "GET /api/razorpay/oauth/status": {
+      requirePermission(user, "view_settings");
+      const config = razorpayConfig();
+      const connection = await getRazorpayOAuthStatus(user.organizationId);
+      return json({ configured: Boolean(config && supabaseServiceConfigured()), connected: connection.connected, accountId: connection.accountId, connectedAt: connection.connectedAt, lastSyncedAt: connection.lastSyncedAt, webhookUrl: `${url.origin}/webhooks/razorpay`, webhookReady: url.protocol === "https:" });
+    }
+    case "GET /api/razorpay/oauth/start": {
+      requirePermission(user, "view_settings");
+      const config = razorpayConfig();
+      if (!config || !supabaseServiceConfigured()) throw Object.assign(new Error("Razorpay OAuth is not configured on this deployment"), { statusCode: 503, code: "FG_RAZORPAY_OAUTH_UNAVAILABLE" });
+      const state = createOAuthState();
+      const value = signRazorpayOAuthState({ state, organizationId: user.organizationId, userId: user.userId, expiresAt: Date.now() + 10 * 60_000 });
+      recordAuditEvent(user, "razorpay_oauth_started", "RazorpayConnection", user.organizationId, correlationId);
+      return redirect(createRazorpayAuthorizationUrl(config, state), { "set-cookie": temporaryCookie("fg_razorpay_oauth", value) });
+    }
+    case "POST /api/razorpay/oauth/sync": {
+      requirePermission(user, "view_settings");
+      checkRateLimit(`razorpay-oauth-sync:${user.userId}`, 3, 60_000);
+      const connection = await getRazorpayOAuthConnection(user.organizationId);
+      if (!connection) throw Object.assign(new Error("Connect Razorpay before syncing"), { statusCode: 409, code: "FG_RAZORPAY_NOT_CONNECTED" });
+      const payments = await fetchRazorpayOAuthPayments(connection.accessToken);
+      const events = paymentsToCanonicalEvents(user.organizationId, payments);
+      const updated = ingestCanonicalEvents(user.organizationId, events, "Razorpay OAuth payments synchronized");
+      await markRazorpayOAuthSynced(user.organizationId);
+      recordAuditEvent(user, "razorpay_oauth_sync", "RazorpayConnection", connection.accountId, correlationId);
+      return json({ dataLabel: updated.dataLabel, syncedPayments: payments.length, ingestedEvents: events.length, cash: updated.cash, alerts: updated.alerts, timeline: updated.timeline });
+    }
     case "GET /api/me":
       recordAuditEvent(user, "session_resolved", "User", user.userId, correlationId);
       return json({ user, dataLabel: runtime.dataLabel, organization: runtime.profile, onboarding: buildOnboardingSummary(user.organizationId) });
@@ -486,6 +530,31 @@ function redirect(location: string, headers: Record<string, string | string[]> =
 function parseCookieHeader(value: string): Record<string, string> { return Object.fromEntries(value.split(";").map((part) => part.trim().split("=")).filter((pair): pair is [string, string] => pair.length === 2)); }
 function temporaryCookie(name: string, value: string): string { return `${name}=${value}; HttpOnly; SameSite=Lax; Path=/; Max-Age=600${process.env.NODE_ENV === "production" ? "; Secure" : ""}`; }
 function clearTemporaryCookie(name: string): string { return `${name}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0${process.env.NODE_ENV === "production" ? "; Secure" : ""}`; }
+type RazorpayOAuthState = Readonly<{ state: string; organizationId: string; userId: string; expiresAt: number }>;
+function signRazorpayOAuthState(state: RazorpayOAuthState): string {
+  const payload = Buffer.from(JSON.stringify(state)).toString("base64url");
+  const signature = createHmac("sha256", razorpayStateSecret()).update(payload).digest("base64url");
+  return `${payload}.${signature}`;
+}
+function verifyRazorpayOAuthState(value: string | undefined, expectedState: string | null): RazorpayOAuthState | undefined {
+  if (!value || !expectedState) return undefined;
+  const [payload, signature] = value.split(".");
+  if (!payload || !signature) return undefined;
+  const expected = createHmac("sha256", razorpayStateSecret()).update(payload).digest("base64url");
+  const left = Buffer.from(expected); const right = Buffer.from(signature);
+  if (left.length !== right.length || !timingSafeEqual(left, right)) return undefined;
+  try {
+    const parsed = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as Partial<RazorpayOAuthState>;
+    return typeof parsed.state === "string" && typeof parsed.organizationId === "string" && typeof parsed.userId === "string" && typeof parsed.expiresAt === "number" && parsed.state === expectedState && parsed.expiresAt > Date.now()
+      ? { state: parsed.state, organizationId: parsed.organizationId, userId: parsed.userId, expiresAt: parsed.expiresAt }
+      : undefined;
+  } catch { return undefined; }
+}
+function razorpayStateSecret(): string {
+  const secret = process.env.RAZORPAY_TOKEN_ENCRYPTION_KEY;
+  if (!secret) throw Object.assign(new Error("Razorpay OAuth is not configured"), { statusCode: 503, code: "FG_RAZORPAY_OAUTH_UNAVAILABLE" });
+  return secret;
+}
 
 function withHeaders(response: Response, correlationId: string): Response {
   const headers = new Headers(response.headers);

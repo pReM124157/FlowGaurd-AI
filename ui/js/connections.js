@@ -1,15 +1,33 @@
 const $ = (id) => document.getElementById(id);
 async function api(path, options) { const response = await fetch(path, { credentials: "same-origin", ...options }); if (!response.ok) throw new Error("Request failed"); return response.json(); }
-$("razorpay-sync").onclick = async () => {
-  if (!$("razorpay-consent").checked) { $("razorpay-status").textContent = "Confirm consent before importing payment data."; return; }
-  $("razorpay-status").textContent = "Syncing Razorpay...";
-  try { const result = await api("/api/razorpay/direct-sync", { method: "POST" }); $("razorpay-status").textContent = `${result.ingestedEvents} ledger events imported from Razorpay.`; }
-  catch { $("razorpay-status").textContent = "Sync unavailable. Confirm the server-side Razorpay configuration."; }
+let webhookUrl = `${location.origin}/webhooks/razorpay`;
+async function refreshRazorpayStatus() {
+  try {
+    const status = await api("/api/razorpay/oauth/status");
+    webhookUrl = status.webhookUrl || webhookUrl;
+    $("webhook-url").textContent = webhookUrl;
+    $("webhook-note").textContent = status.webhookReady
+      ? "This endpoint verifies Razorpay signatures before any ledger event is accepted."
+      : "Deploy over public HTTPS before Razorpay can deliver webhook events.";
+    $("razorpay-connect").disabled = !status.configured;
+    $("razorpay-connect").textContent = status.connected ? "Reconnect Razorpay" : "Connect Razorpay";
+    $("razorpay-sync").hidden = !status.connected;
+    if (status.connected) $("razorpay-status").textContent = `Connected${status.accountId ? ` to account ${status.accountId}` : ""}${status.lastSyncedAt ? ` · last synced ${new Date(status.lastSyncedAt).toLocaleString()}` : " · ready to sync"}.`;
+    else if (!status.configured) $("razorpay-status").textContent = "Razorpay OAuth will be available after this deployment has its Partner credentials and secure token storage configured.";
+    else $("razorpay-status").textContent = "No Razorpay account is connected yet.";
+  } catch { $("razorpay-status").textContent = "Unable to read Razorpay connection status."; }
+}
+$("razorpay-connect").onclick = () => {
+  if (!$("razorpay-consent").checked) { $("razorpay-status").textContent = "Confirm consent before connecting Razorpay."; return; }
+  location.assign("/api/razorpay/oauth/start");
 };
-const webhookUrl = `${location.origin}/webhooks/razorpay`;
-$("webhook-url").textContent = webhookUrl;
-$("webhook-note").textContent = location.protocol === "https:" ? "This endpoint verifies Razorpay signatures before any ledger event is accepted." : "A public HTTPS deployment is required before Razorpay can deliver events here.";
+$("razorpay-sync").onclick = async () => {
+  $("razorpay-status").textContent = "Syncing Razorpay payments...";
+  try { const result = await api("/api/razorpay/oauth/sync", { method: "POST" }); $("razorpay-status").textContent = `${result.ingestedEvents} ledger events imported from ${result.syncedPayments} Razorpay payments.`; }
+  catch { $("razorpay-status").textContent = "Sync failed. Reconnect Razorpay or check the server connection status."; }
+};
 $("copy-webhook").onclick = async () => { await navigator.clipboard?.writeText(webhookUrl); $("copy-webhook").textContent = "Copied"; };
+refreshRazorpayStatus();
 
 const providerDialog = $("provider-dialog");
 $("provider-dialog-close").onclick = () => providerDialog.close();

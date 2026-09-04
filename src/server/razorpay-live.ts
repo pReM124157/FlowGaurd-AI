@@ -10,6 +10,7 @@ export type RazorpayConnectionConfig = Readonly<{
 }>;
 
 export type RazorpayDirectConfig = Readonly<{ keyId: string; keySecret: string }>;
+export type RazorpayOAuthToken = Readonly<{ accessToken: string; refreshToken: string; accessTokenExpiresAt: string; refreshTokenExpiresAt?: string; accountId: string }>;
 
 type RazorpayEntity = Record<string, unknown>;
 export type RazorpayWebhook = Readonly<{ event?: unknown; payload?: unknown; created_at?: unknown }>;
@@ -67,6 +68,51 @@ export function createRazorpayAuthorizationUrl(config: RazorpayConnectionConfig,
   url.searchParams.set("scope", "read_only");
   url.searchParams.set("state", state);
   return url.toString();
+}
+
+/** Exchanges an OAuth authorization code on the server. The browser never sees these tokens. */
+export async function exchangeRazorpayAuthorizationCode(config: RazorpayConnectionConfig, code: string): Promise<RazorpayOAuthToken> {
+  const body = new URLSearchParams({
+    grant_type: "authorization_code",
+    client_id: config.clientId,
+    client_secret: config.clientSecret,
+    redirect_uri: config.redirectUri,
+    code,
+  });
+  const response = await fetch("https://auth.razorpay.com/token", {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body,
+    signal: AbortSignal.timeout(10_000),
+  });
+  const payload = await response.json().catch(() => ({})) as Record<string, unknown>;
+  const accessToken = typeof payload.access_token === "string" ? payload.access_token : "";
+  const refreshToken = typeof payload.refresh_token === "string" ? payload.refresh_token : "";
+  const accountId = typeof payload.razorpay_account_id === "string" ? payload.razorpay_account_id
+    : typeof payload.account_id === "string" ? payload.account_id : "";
+  const expiresIn = typeof payload.expires_in === "number" && Number.isFinite(payload.expires_in) ? payload.expires_in : 0;
+  if (!response.ok || !accessToken || !refreshToken || !accountId || expiresIn <= 0) {
+    throw Object.assign(new Error("Razorpay OAuth token exchange failed"), { statusCode: 502, code: "FG_RAZORPAY_OAUTH_EXCHANGE_FAILED" });
+  }
+  return Object.freeze({
+    accessToken,
+    refreshToken,
+    accountId,
+    accessTokenExpiresAt: new Date(Date.now() + expiresIn * 1_000).toISOString(),
+    refreshTokenExpiresAt: typeof payload.refresh_token_expires_in === "number" && Number.isFinite(payload.refresh_token_expires_in)
+      ? new Date(Date.now() + payload.refresh_token_expires_in * 1_000).toISOString()
+      : undefined,
+  });
+}
+
+export async function fetchRazorpayOAuthPayments(accessToken: string): Promise<RazorpayEntity[]> {
+  const response = await fetch("https://api.razorpay.com/v1/payments?count=100", {
+    headers: { authorization: `Bearer ${accessToken}` },
+    signal: AbortSignal.timeout(10_000),
+  });
+  if (!response.ok) throw Object.assign(new Error("Razorpay OAuth payments sync failed"), { statusCode: 502, code: "FG_RAZORPAY_OAUTH_SYNC_FAILED" });
+  const payload = await response.json() as { items?: unknown };
+  return Array.isArray(payload.items) ? payload.items.filter(isRecord) : [];
 }
 
 /** Razorpay signs the exact raw webhook body; parsed/re-serialized JSON is unsafe here. */
