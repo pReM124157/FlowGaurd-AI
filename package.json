@@ -8,7 +8,7 @@
     "phase:validate": "node --test test/*.test.ts",
     "demo": "node src/demo/demo-company.ts",
     "dev": "node --env-file=.env src/server/server.ts",
-    "start": "node --env-file=.env src/server/server.ts",
+    "start": "node src/server/server.ts",
     "lint": "node scripts/lint.mjs",
     "typecheck": "node --test test/*.test.ts",
     "build": "node scripts/build.mjs",
