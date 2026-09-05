@@ -23,6 +23,7 @@
           <button id="razorpay-connect" type="button">Connect Razorpay</button>
           <button id="razorpay-sync" type="button" hidden>Sync latest payments</button>
           <button id="razorpay-test-payment" type="button" hidden>Run ₹100 test payment</button>
+          <button id="razorpay-delete" class="configure-provider text-action" type="button" hidden>Disconnect and delete data</button>
           <small id="razorpay-status" aria-live="polite">Checking connection status...</small>
         </article>
         <article class="connection-card unavailable-card">
@@ -44,6 +45,10 @@
         <div><p class="workspace-index">WEBHOOK DELIVERY</p><h2>Keep Razorpay current.</h2><p>Add this endpoint in Razorpay Dashboard → Webhooks and subscribe to payment captured and refund events.</p></div>
         <div class="webhook-code"><code id="webhook-url"></code><button id="copy-webhook" type="button">Copy endpoint</button><small id="webhook-note" aria-live="polite"></small></div>
       </section>
+      <section class="privacy-panel">
+        <div><p class="workspace-index">DATA CONTROL</p><h2>Your connected data stays yours.</h2><p>Razorpay access is limited to payment and refund information. You can revoke access and erase connected payment data at any time. Declared operating inputs are not affected.</p></div>
+        <button id="open-privacy" class="configure-provider privacy-action" type="button">Manage Razorpay data</button>
+      </section>
     </main>
     <dialog id="provider-dialog" class="provider-dialog">
       <form method="dialog" id="provider-form">
@@ -55,6 +60,18 @@
         <select id="provider-select" required></select>
         <p class="dialog-note">Credentials, API secrets, and bank passwords are never entered here. The selected provider is configured only in FlowGuard’s server environment.</p>
         <button class="dialog-submit" value="submit">Request secure setup</button>
+      </form>
+    </dialog>
+    <dialog id="privacy-dialog" class="provider-dialog">
+      <form method="dialog" id="privacy-form">
+        <button class="dialog-close" id="privacy-dialog-close" type="button" aria-label="Close">×</button>
+        <p class="workspace-index">RAZORPAY DATA CONTROL</p>
+        <h2>Disconnect and delete</h2>
+        <p>This revokes FlowGuard’s Razorpay access and removes retained Razorpay webhook data and derived payment records. Type <strong>DELETE</strong> to continue.</p>
+        <label for="delete-confirmation">Confirmation</label>
+        <input id="delete-confirmation" autocomplete="off" placeholder="DELETE">
+        <p class="dialog-note" id="delete-status" aria-live="polite"></p>
+        <button class="dialog-submit" type="submit">Delete connected data</button>
       </form>
     </dialog>
     <script src="../js/connections.js"></script>

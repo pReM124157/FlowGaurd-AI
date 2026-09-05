@@ -26,9 +26,11 @@ async function refreshRazorpayStatus() {
     $("razorpay-connect").textContent = status.connected ? "Reconnect Razorpay" : "Connect Razorpay";
     $("razorpay-sync").hidden = !status.connected;
     $("razorpay-test-payment").hidden = !status.testModeConfigured;
+    $("razorpay-delete").hidden = !(status.connected || status.webhook?.count > 0);
     if (status.connected) $("razorpay-status").textContent = `Connected${status.accountId ? ` to account ${status.accountId}` : ""}${status.lastSyncedAt ? ` · last synced ${new Date(status.lastSyncedAt).toLocaleString()}` : " · ready to sync"}.`;
     else if (!status.configured) $("razorpay-status").textContent = "Razorpay OAuth will be available after this deployment has its Partner credentials and secure token storage configured.";
     else $("razorpay-status").textContent = "No Razorpay account is connected yet.";
+    if (status.webhook?.count > 0) $("webhook-note").textContent = `Verified delivery received: ${status.webhook.latestEvent} at ${new Date(status.webhook.latestReceivedAt).toLocaleString()}. ${status.webhook.count} signed event${status.webhook.count === 1 ? "" : "s"} retained.`;
   } catch { $("razorpay-status").textContent = "Unable to read Razorpay connection status."; }
 }
 $("razorpay-connect").onclick = () => {
@@ -104,4 +106,22 @@ $("provider-form").addEventListener("submit", async (event) => {
     status.textContent = `${provider} selected. Secure server configuration is required before live data can sync.`;
     providerDialog.close();
   } catch { status.textContent = "Unable to save this provider selection."; }
+});
+
+const privacyDialog = $("privacy-dialog");
+$("open-privacy").onclick = () => privacyDialog.showModal();
+$("razorpay-delete").onclick = () => privacyDialog.showModal();
+$("privacy-dialog-close").onclick = () => privacyDialog.close();
+$("privacy-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const confirmation = $("delete-confirmation").value;
+  if (confirmation !== "DELETE") { $("delete-status").textContent = "Type DELETE exactly to confirm."; return; }
+  try {
+    $("delete-status").textContent = "Deleting connected Razorpay data...";
+    await api("/api/razorpay/disconnect", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ confirmation }) });
+    $("delete-confirmation").value = "";
+    privacyDialog.close();
+    $("razorpay-status").textContent = "Razorpay access and connected data have been removed.";
+    await refreshRazorpayStatus();
+  } catch { $("delete-status").textContent = "Unable to delete connected data. Please try again."; }
 });

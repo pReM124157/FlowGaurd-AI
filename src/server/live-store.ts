@@ -160,6 +160,16 @@ export function ingestCanonicalEvents(organizationId: string, events: CanonicalE
   return getOrganizationRuntime(organizationId);
 }
 
+/** Removes only Razorpay-derived events; declared inputs and other sources stay intact. */
+export function removeRazorpayLiveEvents(organizationId: string): OrganizationRuntime {
+  const existing = eventStreams.get(organizationId) ?? [];
+  eventStreams.set(organizationId, existing.filter((event) => event.provenance.source !== "RAZORPAY_LIVE"));
+  alertsByOrg.delete(organizationId);
+  notificationsByOrg.delete(organizationId);
+  pushTimeline(organizationId, "Razorpay connection and imported payment data removed", "INGESTION");
+  return getOrganizationRuntime(organizationId);
+}
+
 export function ingestBankCsv(organizationId: string, rows: Array<{ date: string; description: string; amountMinor: number; type: "CREDIT" | "DEBIT"; reference: string; settlementId?: string }>): OrganizationRuntime {
   return ingestCanonicalEvents(
     organizationId,

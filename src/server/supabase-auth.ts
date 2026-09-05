@@ -16,6 +16,8 @@ const publishableKey = () => process.env.FLOWGUARD_SUPABASE_PUBLISHABLE_KEY ?? p
 export function supabaseAuthConfigured(): boolean { return Boolean(baseUrl() && publishableKey()); }
 export function supabaseServiceConfigured(): boolean { return Boolean(baseUrl() && process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.RAZORPAY_TOKEN_ENCRYPTION_KEY); }
 
+type PersistedRazorpayWebhook = Readonly<{ event_id: string; event_name: string; received_at: string; payload: unknown }>;
+
 type RazorpayConnectionRow = Readonly<{
   organization_id: string;
   razorpay_account_id: string;
@@ -69,6 +71,57 @@ export async function getRazorpayOAuthStatus(organizationId: string): Promise<{ 
 export async function markRazorpayOAuthSynced(organizationId: string): Promise<void> {
   const response = await serviceDataFetch(`/rest/v1/razorpay_connections?organization_id=eq.${encodeURIComponent(organizationId)}`, { method: "PATCH", body: JSON.stringify({ last_synced_at: new Date().toISOString() }) });
   if (!response.ok) throw Object.assign(new Error("Unable to record Razorpay sync"), { statusCode: 503, code: "FG_RAZORPAY_CONNECTION_PERSISTENCE_FAILED" });
+}
+
+/** Records the narrow payment-data consent needed for a Razorpay connection. */
+export async function recordRazorpayConsent(organizationId: string): Promise<void> {
+  if (!supabaseServiceConfigured()) return;
+  const response = await serviceDataFetch("/rest/v1/privacy_consents?on_conflict=organization_id,purpose", {
+    method: "POST",
+    headers: { prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify({ organization_id: organizationId, purpose: "RAZORPAY_DATA_ACCESS", version: "2026-09-05", granted_at: new Date().toISOString(), withdrawn_at: null }),
+  });
+  if (!response.ok) throw Object.assign(new Error("Unable to record Razorpay consent"), { statusCode: 503, code: "FG_RAZORPAY_CONSENT_PERSISTENCE_FAILED" });
+}
+
+/** Persists a verified raw event before ledger projection for durable idempotency. */
+export async function saveRazorpayWebhookEvent(input: { eventId: string; organizationId: string; eventName: string; payload: unknown }): Promise<boolean | undefined> {
+  if (!supabaseServiceConfigured()) return undefined;
+  const response = await serviceDataFetch("/rest/v1/razorpay_webhook_events?on_conflict=event_id", {
+    method: "POST",
+    headers: { prefer: "resolution=ignore-duplicates,return=representation" },
+    body: JSON.stringify({ event_id: input.eventId, organization_id: input.organizationId, event_name: input.eventName, payload: input.payload, processed_at: new Date().toISOString() }),
+  });
+  if (!response.ok) throw Object.assign(new Error("Unable to retain Razorpay webhook"), { statusCode: 503, code: "FG_RAZORPAY_WEBHOOK_PERSISTENCE_FAILED" });
+  const rows = await response.json().catch(() => []) as unknown[];
+  return rows.length > 0;
+}
+
+export async function listRazorpayWebhookEvents(organizationId: string): Promise<PersistedRazorpayWebhook[]> {
+  if (!supabaseServiceConfigured()) return [];
+  const response = await serviceDataFetch(`/rest/v1/razorpay_webhook_events?organization_id=eq.${encodeURIComponent(organizationId)}&select=event_id,event_name,received_at,payload&order=received_at.asc`, { method: "GET" });
+  if (!response.ok) throw Object.assign(new Error("Unable to load retained Razorpay events"), { statusCode: 503, code: "FG_RAZORPAY_WEBHOOK_PERSISTENCE_FAILED" });
+  return await response.json() as PersistedRazorpayWebhook[];
+}
+
+export async function getRazorpayWebhookSummary(organizationId: string): Promise<{ count: number; latestEvent?: string; latestReceivedAt?: string }> {
+  if (!supabaseServiceConfigured()) return { count: 0 };
+  const response = await serviceDataFetch(`/rest/v1/razorpay_webhook_events?organization_id=eq.${encodeURIComponent(organizationId)}&select=event_name,received_at&order=received_at.desc`, { method: "GET" });
+  if (!response.ok) return { count: 0 };
+  const rows = await response.json() as Array<Pick<PersistedRazorpayWebhook, "event_name" | "received_at">>;
+  return { count: rows.length, latestEvent: rows[0]?.event_name, latestReceivedAt: rows[0]?.received_at };
+}
+
+/** Revokes the OAuth connection and permanently removes retained Razorpay data. */
+export async function deleteRazorpayConnectedData(organizationId: string): Promise<void> {
+  if (!supabaseServiceConfigured()) return;
+  const encoded = encodeURIComponent(organizationId);
+  const [events, connection, consent] = await Promise.all([
+    serviceDataFetch(`/rest/v1/razorpay_webhook_events?organization_id=eq.${encoded}`, { method: "DELETE" }),
+    serviceDataFetch(`/rest/v1/razorpay_connections?organization_id=eq.${encoded}`, { method: "PATCH", body: JSON.stringify({ revoked_at: new Date().toISOString() }) }),
+    serviceDataFetch(`/rest/v1/privacy_consents?organization_id=eq.${encoded}&purpose=eq.RAZORPAY_DATA_ACCESS`, { method: "PATCH", body: JSON.stringify({ withdrawn_at: new Date().toISOString() }) }),
+  ]);
+  if (!events.ok || !connection.ok || !consent.ok) throw Object.assign(new Error("Unable to delete connected Razorpay data"), { statusCode: 503, code: "FG_RAZORPAY_DELETION_FAILED" });
 }
 
 export async function signUpWithSupabase(input: { name: string; email: string; password: string }): Promise<{ session?: AuthSession; confirmationRequired: boolean }> {

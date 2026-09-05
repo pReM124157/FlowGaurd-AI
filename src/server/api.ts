@@ -5,13 +5,13 @@ import { answerFinanceQuestion, type FinancialEvidenceContext } from "../agent/c
 import { explainWithLlm } from "../agent/llm-router.ts";
 import { authenticate, demoLoginCookie, liveFirstRunCookie, requirePermission, type Permission, type Role } from "./auth.ts";
 import { listAuditEvents, recordAudit } from "./audit.ts";
-import { acknowledgeAlert, applyBusinessProfile, applyDataConnections, applyRiskPreferences, ensureOrganization, getOrganizationRuntime, ingestBankCsv, ingestCanonicalEvents, ingestInvoiceCsv, ingestRazorpayMockPayment, requestConnectionSetup, traceOrganizationPayment, type OrganizationRuntime } from "./live-store.ts";
+import { acknowledgeAlert, applyBusinessProfile, applyDataConnections, applyRiskPreferences, ensureOrganization, getOrganizationRuntime, ingestBankCsv, ingestCanonicalEvents, ingestInvoiceCsv, ingestRazorpayMockPayment, removeRazorpayLiveEvents, requestConnectionSetup, traceOrganizationPayment, type OrganizationRuntime } from "./live-store.ts";
 import { logJson } from "./logger.ts";
 import { metricsSnapshot, metricsText, recordMetric } from "./metrics.ts";
 import { buildOnboardingSummary, finalizeInitialCalculation, getOnboardingRecord, isDashboardReady, restoreOnboardingRecord, runReadinessAudit, saveBusinessProfile, saveDataConnections, saveRiskPreferences, updateBusinessProfile, type OnboardingRecord } from "./onboarding.ts";
 import { checkRateLimit } from "./rate-limit.ts";
 import { clearOAuthStateCookie, clearSessionCookie, createGoogleAuthorization, finishGoogleAuthorization, invalidateOAuthSession, markOAuthOnboardingComplete, oauthStateCookie, sessionCookie } from "./google-oauth.ts";
-import { clearSupabaseSessionCookie, createSupabaseGoogleAuthorization, exchangeSupabaseGoogleCode, getRazorpayOAuthConnection, getRazorpayOAuthStatus, getSupabaseOnboardingProgress, getSupabaseOnboardingStage, markRazorpayOAuthSynced, provisionSupabaseTenant, saveRazorpayOAuthConnection, saveSupabaseOnboardingProgress, signInWithSupabase, signUpWithSupabase, supabaseAuthConfigured, supabaseServiceConfigured, supabaseSessionCookie } from "./supabase-auth.ts";
+import { clearSupabaseSessionCookie, createSupabaseGoogleAuthorization, deleteRazorpayConnectedData, exchangeSupabaseGoogleCode, getRazorpayOAuthConnection, getRazorpayOAuthStatus, getRazorpayWebhookSummary, getSupabaseOnboardingProgress, getSupabaseOnboardingStage, listRazorpayWebhookEvents, markRazorpayOAuthSynced, provisionSupabaseTenant, recordRazorpayConsent, saveRazorpayOAuthConnection, saveRazorpayWebhookEvent, saveSupabaseOnboardingProgress, signInWithSupabase, signUpWithSupabase, supabaseAuthConfigured, supabaseServiceConfigured, supabaseSessionCookie } from "./supabase-auth.ts";
 import { buildDeclaredBaseline } from "./declared-baseline.ts";
 import { createOAuthState, createRazorpayAuthorizationUrl, createRazorpayTestOrder, exchangeRazorpayAuthorizationCode, fetchRazorpayOAuthPayments, fetchRazorpayPayments, paymentsToCanonicalEvents, razorpayConfig, razorpayDirectConfig, verifyRazorpayWebhook, webhookOrganizationId, webhookToCanonicalEvents, type RazorpayWebhook } from "./razorpay-live.ts";
 
@@ -37,6 +37,9 @@ async function restoreSupabaseTenantState(accessToken: string | undefined, organ
   if (record.businessProfile) applyBusinessProfile(organizationId, record.businessProfile.value);
   if (record.riskPreferences) applyRiskPreferences(organizationId, record.riskPreferences.value);
   if (record.dataConnections) applyDataConnections(organizationId, record.dataConnections.value);
+  const retainedWebhooks = await listRazorpayWebhookEvents(organizationId);
+  const restoredEvents = retainedWebhooks.flatMap((webhook) => webhookToCanonicalEvents(organizationId, webhook.event_id, webhook.payload as RazorpayWebhook));
+  if (restoredEvents.length > 0) ingestCanonicalEvents(organizationId, restoredEvents, "Retained Razorpay events restored");
   restoredSupabaseTenants.add(organizationId);
 }
 
@@ -110,6 +113,8 @@ async function handleRazorpayWebhook(request: Request, correlationId: string): P
   }
 
   ensureOrganization(organizationId, "Razorpay connected organization");
+  const saved = await saveRazorpayWebhookEvent({ eventId: webhookEventId, organizationId, eventName: typeof payload.event === "string" ? payload.event : "unknown", payload });
+  if (saved === false) return json({ accepted: true, duplicate: true });
   const events = webhookToCanonicalEvents(organizationId, webhookEventId, payload);
   if (events.length > 0) ingestCanonicalEvents(organizationId, events, `Razorpay webhook: ${String(payload.event ?? "event")}`);
   processedRazorpayWebhookIds.add(webhookEventId);
@@ -238,12 +243,14 @@ async function handleApi(request: Request, url: URL, correlationId: string): Pro
       requirePermission(user, "view_settings");
       const config = razorpayConfig();
       const connection = await getRazorpayOAuthStatus(user.organizationId);
-      return json({ configured: Boolean(config && supabaseServiceConfigured()), testModeConfigured: Boolean(razorpayDirectConfig()), connected: connection.connected, accountId: connection.accountId, connectedAt: connection.connectedAt, lastSyncedAt: connection.lastSyncedAt, webhookUrl: `${url.origin}/webhooks/razorpay`, webhookReady: url.protocol === "https:" });
+      const webhook = await getRazorpayWebhookSummary(user.organizationId);
+      return json({ configured: Boolean(config && supabaseServiceConfigured()), testModeConfigured: Boolean(razorpayDirectConfig()), connected: connection.connected, accountId: connection.accountId, connectedAt: connection.connectedAt, lastSyncedAt: connection.lastSyncedAt, webhookUrl: `${url.origin}/webhooks/razorpay`, webhookReady: url.protocol === "https:", webhook });
     }
     case "GET /api/razorpay/oauth/start": {
       requirePermission(user, "view_settings");
       const config = razorpayConfig();
       if (!config || !supabaseServiceConfigured()) throw Object.assign(new Error("Razorpay OAuth is not configured on this deployment"), { statusCode: 503, code: "FG_RAZORPAY_OAUTH_UNAVAILABLE" });
+      await recordRazorpayConsent(user.organizationId);
       const state = createOAuthState();
       const value = signRazorpayOAuthState({ state, organizationId: user.organizationId, userId: user.userId, expiresAt: Date.now() + 10 * 60_000 });
       recordAuditEvent(user, "razorpay_oauth_started", "RazorpayConnection", user.organizationId, correlationId);
@@ -266,9 +273,19 @@ async function handleApi(request: Request, url: URL, correlationId: string): Pro
       checkRateLimit(`razorpay-test-order:${user.userId}`, 5, 60_000);
       const config = razorpayDirectConfig();
       if (!config) throw Object.assign(new Error("Razorpay Test Mode is not configured"), { statusCode: 503, code: "FG_RAZORPAY_UNAVAILABLE" });
+      await recordRazorpayConsent(user.organizationId);
       const order = await createRazorpayTestOrder(config, { organizationId: user.organizationId, amountMinor: 10_000 });
       recordAuditEvent(user, "razorpay_test_order_created", "RazorpayOrder", order.id, correlationId);
       return json({ keyId: config.keyId, orderId: order.id, amountMinor: order.amountMinor, currency: order.currency, organizationId: user.organizationId });
+    }
+    case "POST /api/razorpay/disconnect": {
+      requirePermission(user, "view_settings");
+      const body = await readJson(request);
+      if (readString(body, "confirmation") !== "DELETE") throw Object.assign(new Error("Deletion confirmation is required"), { statusCode: 400, code: "FG_INVALID_PAYLOAD" });
+      await deleteRazorpayConnectedData(user.organizationId);
+      const updated = removeRazorpayLiveEvents(user.organizationId);
+      recordAuditEvent(user, "razorpay_connected_data_deleted", "RazorpayConnection", user.organizationId, correlationId);
+      return json({ deleted: true, dataLabel: updated.dataLabel, dataState: updated.dataState });
     }
     case "GET /api/me":
       recordAuditEvent(user, "session_resolved", "User", user.userId, correlationId);
