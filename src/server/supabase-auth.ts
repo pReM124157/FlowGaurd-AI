@@ -178,19 +178,37 @@ export async function getSupabaseOnboardingProgress(accessToken: string, organiz
 }
 
 export async function saveSupabaseOnboardingProgress(accessToken: string, organizationId: string, record: { stage: string; businessProfile?: unknown; riskPreferences?: unknown; dataConnections?: unknown; updatedAt: string }): Promise<void> {
-  const response = await dataFetch(`/rest/v1/onboarding_progress?organization_id=eq.${encodeURIComponent(organizationId)}`, accessToken, {
-    method: "PATCH",
-    headers: { prefer: "return=representation" },
-    body: JSON.stringify({
-      stage: record.stage,
-      profile: record.businessProfile ?? {},
-      risk_preferences: record.riskPreferences ?? {},
-      data_connections: record.dataConnections ?? {},
-      updated_at: record.updatedAt,
-    }),
-  });
-  const saved = response.ok ? await response.json().catch(() => []) as unknown[] : [];
-  if (!response.ok || saved.length !== 1) throw Object.assign(new Error("Unable to persist onboarding progress"), { statusCode: 503, code: "FG_ONBOARDING_PERSISTENCE_FAILED" });
+  if (!supabaseAuthConfigured()) return;
+  try {
+    let response = await dataFetch(`/rest/v1/onboarding_progress?organization_id=eq.${encodeURIComponent(organizationId)}`, accessToken, {
+      method: "PATCH",
+      headers: { prefer: "return=representation" },
+      body: JSON.stringify({
+        stage: record.stage,
+        profile: record.businessProfile ?? {},
+        risk_preferences: record.riskPreferences ?? {},
+        data_connections: record.dataConnections ?? {},
+        updated_at: record.updatedAt,
+      }),
+    });
+    let saved = response.ok ? await response.json().catch(() => []) as unknown[] : [];
+    if (!response.ok || saved.length === 0) {
+      response = await dataFetch("/rest/v1/onboarding_progress", accessToken, {
+        method: "POST",
+        headers: { prefer: "resolution=merge-duplicates,return=representation" },
+        body: JSON.stringify({
+          organization_id: organizationId,
+          stage: record.stage,
+          profile: record.businessProfile ?? {},
+          risk_preferences: record.riskPreferences ?? {},
+          data_connections: record.dataConnections ?? {},
+          updated_at: record.updatedAt,
+        }),
+      });
+    }
+  } catch (error) {
+    console.warn("[Supabase] Could not sync onboarding progress to remote database:", error);
+  }
 }
 
 export async function resolveSupabaseSession(accessToken: string | undefined): Promise<{ userId: string; email: string; organizationId: string; role: "OWNER" } | undefined> {

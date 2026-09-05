@@ -18,7 +18,7 @@ import { createOAuthState, createRazorpayAuthorizationUrl, createRazorpayTestOrd
 type JsonValue = null | string | number | boolean | JsonValue[] | { [key: string]: JsonValue };
 
 const SECURITY_HEADERS = {
-  "content-security-policy": "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://checkout.razorpay.com; img-src 'self' data:; connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; frame-ancestors 'none'",
+  "content-security-policy": "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; script-src 'self' 'unsafe-inline' https://checkout.razorpay.com; img-src 'self' data:; connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; frame-ancestors 'none'",
   "x-content-type-options": "nosniff",
   "referrer-policy": "strict-origin-when-cross-origin",
   "x-frame-options": "DENY",
@@ -532,8 +532,15 @@ async function handleStatic(request: Request, url: URL): Promise<Response> {
   const root = join(process.cwd(), "ui");
   const path = join(root, pathname.replace(/^\/+/, ""));
   if (!path.startsWith(root)) throw Object.assign(new Error("Not found"), { statusCode: 404, code: "FG_NOT_FOUND" });
-  const content = await readFile(path);
-  return new Response(content, { headers: { "content-type": contentType(path) } });
+  try {
+    const content = await readFile(path);
+    return new Response(content, { headers: { "content-type": contentType(path) } });
+  } catch (error: unknown) {
+    if (typeof error === "object" && error !== null && "code" in error && (error as { code: unknown }).code === "ENOENT") {
+      throw Object.assign(new Error("Not found"), { statusCode: 404, code: "FG_NOT_FOUND" });
+    }
+    throw error;
+  }
 }
 
 function routeKey(method: string, pathname: string): string {
