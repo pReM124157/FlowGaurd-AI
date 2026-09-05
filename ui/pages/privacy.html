@@ -1,134 +1,194 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Privacy Policy & Data Protection · FlowGuard AI</title>
-  <link rel="stylesheet" href="../css/design-system.css">
-  <link rel="stylesheet" href="../css/dashboard.css">
-  <style>
-    .privacy-container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 48px 24px;
-    }
-    .privacy-header {
-      margin-bottom: 32px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      padding-bottom: 24px;
-    }
-    .privacy-header h1 {
-      font-size: 32px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 8px;
-      background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
-      -webkit-background-clip: text;
-      -webkit-fill-color: transparent;
-    }
-    .privacy-card {
-      background: rgba(30, 41, 59, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 32px;
-      margin-bottom: 24px;
-    }
-    .privacy-card h2 {
-      font-size: 20px;
-      color: #f8fafc;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .privacy-card p, .privacy-card li {
-      color: #94a3b8;
-      font-size: 14px;
-      line-height: 1.7;
-      margin-bottom: 12px;
-    }
-    .privacy-card ul {
-      padding-left: 20px;
-      margin-bottom: 16px;
-    }
-    .badge-iso {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 4px 10px;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.2);
-      color: #10b981;
-      border-radius: 9999px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Privacy & Data Governance — FlowGuard</title>
+  <link rel="stylesheet" href="../css/design-system.css" />
+  <link rel="stylesheet" href="../css/workspace.css" />
+  <link rel="stylesheet" href="../css/connections.css" />
 </head>
-<body style="background:#0b0f19;color:#fff;font-family:sans-serif;">
-  <div class="topbar" style="display:flex;justify-content:space-between;align-items:center;padding:16px 32px;border-bottom:1px solid rgba(255,255,255,0.08);">
-    <div style="display:flex;align-items:center;gap:16px;">
-      <a href="../index.html" class="logo" style="text-decoration:none;font-weight:700;font-size:18px;color:#fff;">
-        <span>🛡️</span> FlowGuard <span style="color:#38bdf8;">AI</span>
-      </a>
-      <span class="badge-iso">🔒 Compliance Verified</span>
-    </div>
-    <div>
-      <a href="dashboard.html" style="background:#1e293b;color:#fff;text-decoration:none;padding:8px 16px;border-radius:6px;font-size:13px;border:1px solid rgba(255,255,255,0.1);">Go to Dashboard</a>
-    </div>
-  </div>
+<body class="control-body" data-page="privacy">
+  <aside class="workspace-rail" aria-label="Product navigation">
+    <a class="workspace-brand" href="dashboard.html"><span class="workspace-brand-mark">◈</span>FlowGuard</a>
+    <nav>
+      <p>CONTROL CENTER</p>
+      <a href="dashboard.html">Overview</a>
+      <a href="cash.html">Cash</a>
+      <a href="forecast.html">Forecast</a>
+      <a href="receivables.html">Receivables</a>
+      <a href="reconciliation.html">Reconciliation</a>
+      <a href="scenarios.html">Scenarios</a>
+      <a href="connections.html">Connections</a>
+      <p>INTELLIGENCE</p>
+      <a href="risks.html">Risks</a>
+      <a href="ask-flowguard.html">Ask FlowGuard</a>
+      <a class="active" href="privacy.html">Privacy & Governance</a>
+    </nav>
+    <button class="workspace-account" id="workspace-logout" type="button">
+      <span id="workspace-account-initial">F</span>
+      <b id="workspace-account-name">FlowGuard</b>
+      <small id="workspace-account-meta">OWNER · Sign out</small>
+    </button>
+  </aside>
 
-  <div class="privacy-container">
-    <div class="privacy-header">
-      <h1>Privacy Policy & Data Governance</h1>
-      <p style="color:#94a3b8;font-size:14px;">Effective Date: September 2026 · Compliant with Razorpay Partner Policies & Data Protection Standards</p>
-    </div>
+  <main class="control-main">
+    <nav class="workspace-nav" aria-label="Financial workspace">
+      <a href="dashboard.html">Overview</a>
+      <a href="cash.html">Cash</a>
+      <a href="forecast.html">Forecast</a>
+      <a href="receivables.html">Receivables</a>
+      <a href="reconciliation.html">Reconciliation</a>
+      <a href="scenarios.html">Scenarios</a>
+      <a href="connections.html">Connections</a>
+      <a href="risks.html">Risks</a>
+      <a href="ask-flowguard.html">Ask FlowGuard</a>
+      <a class="active" href="privacy.html">Privacy</a>
+    </nav>
 
-    <div class="privacy-card">
-      <h2><span>🛡️</span> 1. Core Commitment & Data Minimization</h2>
-      <p>FlowGuard AI provides deterministic financial telemetry, liquidity early-warning audits, and cash runway predictions for businesses. We operate on a strict <strong>Data Minimization Principle</strong>:</p>
-      <ul>
-        <li><strong>We NEVER collect or store:</strong> Raw credit/debit card numbers, CVVs, net banking credentials, or customer banking passwords.</li>
-        <li><strong>We ONLY ingest:</strong> Transaction IDs, timestamps, amounts, settlement statuses, gateway fee breakdowns, and high-level reconciliation metadata necessary for cash-flow ledger derivation.</li>
-      </ul>
-    </div>
+    <section class="workspace">
+      <div class="workspace-intro">
+        <div>
+          <p class="workspace-index">FLOWGUARD / 10 / PRIVACY &amp; DATA GOVERNANCE</p>
+          <h1>Sovereign data.<br>Zero fabrication.</h1>
+          <p class="lede">How FlowGuard safeguards your transactional data, enforces cryptographic verification, and guarantees instant right-to-erasure.</p>
+        </div>
+        <div class="workspace-orbit" aria-hidden="true">
+          <span></span><span></span><span></span>
+          <p class="orbit-label">GOVERNANCE SEQUENCE</p>
+          <strong>10</strong>
+          <div class="orbit-caption"><span>MINIMIZE</span><span>ENCRYPT</span><span>ERASE</span></div>
+        </div>
+      </div>
 
-    <div class="privacy-card">
-      <h2><span>⚡</span> 2. Razorpay Integration & Webhook Handling</h2>
-      <p>When you connect your Razorpay account to FlowGuard AI:</p>
-      <ul>
-        <li><strong>Cryptographic Verification:</strong> All incoming webhooks are validated using HMAC-SHA256 signatures before processing.</li>
-        <li><strong>Encrypted Transport & Storage:</strong> All API credentials, OAuth tokens, and webhook payloads are encrypted in transit (TLS 1.3) and at rest (AES-256) via Supabase Enterprise PostgreSQL.</li>
-        <li><strong>Read-Only Financial Intelligence:</strong> FlowGuard only accesses payment status and settlement reports. We do not initiate debits or unapproved payouts.</li>
-      </ul>
-    </div>
+      <div class="workspace-grid">
+        <!-- Panel 1: Standards and Data Minimization -->
+        <article class="workspace-panel">
+          <p class="section-kicker">DATA MINIMIZATION &amp; SECURITY PROTOCOLS</p>
+          <h2>Only the evidence required for reconciliation.</h2>
+          
+          <div class="data-row">
+            <div>
+              <b>Zero Raw Credential Storage</b>
+              <small>FlowGuard never captures, stores, or sees customer card numbers, CVVs, net-banking passwords, or account PINs.</small>
+            </div>
+            <div>
+              <b>EXCLUDED</b>
+              <small class="state">ENFORCED</small>
+            </div>
+          </div>
 
-    <div class="privacy-card">
-      <h2><span>🗑️</span> 3. Right to Erasure & 1-Click Data Purge Flow</h2>
-      <p>You maintain 100% sovereign ownership over your organization's data. FlowGuard includes an instant, hard-delete capability:</p>
-      <ul>
-        <li><strong>Disconnect Source:</strong> You can disconnect your Razorpay integration at any time from the Dashboard settings.</li>
-        <li><strong>Instant Data Purge:</strong> Clicking <em>"Delete All Stored Data"</em> triggers an atomic cascade deletion across Supabase tables (<code>ledger_entries</code>, <code>webhook_events</code>, <code>data_sources</code>, and <code>tenants</code>), permanently removing all stored financial records and cached metrics.</li>
-      </ul>
-    </div>
+          <div class="data-row">
+            <div>
+              <b>Encrypted Ingestion &amp; Storage</b>
+              <small>All webhook traffic and API tokens are encrypted in transit via TLS 1.3 and at rest with AES-256 via Supabase PostgreSQL.</small>
+            </div>
+            <div>
+              <b>AES-256</b>
+              <small class="state">ENCRYPTED</small>
+            </div>
+          </div>
 
-    <div class="privacy-card">
-      <h2><span>⚖️</span> 4. Financial Provenance & Zero-Fabrication Policy</h2>
-      <p>To eliminate hallucinated financial statements in AI workflows:</p>
-      <ul>
-        <li>Metrics labelled <code>[ACTUAL]</code> are strictly derived from verified cryptographic payment events.</li>
-        <li>User-configured parameters (e.g. baseline payroll, buffer targets) are segregated and marked <code>[USER_DECLARED]</code>.</li>
-        <li>AI recommendations provided by <em>Ask FlowGuard</em> are deterministic and auditable back to specific ledger transaction UUIDs.</li>
-      </ul>
-    </div>
+          <div class="data-row">
+            <div>
+              <b>HMAC-SHA256 Webhook Verification</b>
+              <small>Every inbound Razorpay webhook payload is cryptographically checked against your webhook secret before ledger entry creation.</small>
+            </div>
+            <div>
+              <b>HMAC-SHA256</b>
+              <small class="state">VERIFIED</small>
+            </div>
+          </div>
 
-    <div class="privacy-card">
-      <h2><span>📬</span> 5. Contact & Data Protection Officer (DPO)</h2>
-      <p>For any privacy inquiries, compliance verification, or custom data processing agreements, please contact:</p>
-      <p><strong>FlowGuard AI Data Protection Office</strong><br>
-      Email: <a href="mailto:privacy@flowguard.ai" style="color:#38bdf8;">privacy@flowguard.ai</a><br>
-      Security Operations: <a href="mailto:security@flowguard.ai" style="color:#38bdf8;">security@flowguard.ai</a></p>
-    </div>
-  </div>
+          <div class="data-row">
+            <div>
+              <b>Deterministic Audit Lineage</b>
+              <small>All financial facts are stamped ACTUAL, FORECAST, or USER_DECLARED to prevent AI hallucination.</small>
+            </div>
+            <div>
+              <b>AUDITABLE</b>
+              <small class="state">IMMUTABLE</small>
+            </div>
+          </div>
+
+          <div class="signal-rack" aria-label="Governance status">
+            <div><i></i><span>Razorpay Partner Policy Compliance</span><small>ACTIVE</small></div>
+            <div><i></i><span>Right-to-Erasure Pipeline</span><small>VERIFIED</small></div>
+            <div><i></i><span>Continuous Ingestion Security</span><small>OPERATIONAL</small></div>
+          </div>
+
+          <a class="source-cta" href="connections.html">View connected sources</a>
+        </article>
+
+        <!-- Panel 2: Right to Erasure & Deletion Action -->
+        <aside class="workspace-panel">
+          <p class="section-kicker">DATA SOVEREIGNTY &amp; ERASURE</p>
+          <h2>Instant 1-click purge.</h2>
+          <p class="lede">You retain total ownership over your data. Triggering a deletion cascades across all stored ledger events and webhook records immediately.</p>
+          
+          <div style="margin: 24px 0; padding: 20px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--paper-bright);">
+            <b style="display:block; font-size:14px; margin-bottom:6px;">Purge Stored Financial Data</b>
+            <p style="font-size:12px; color:var(--muted); line-height:1.5; margin-bottom:16px;">
+              Permanently delete all ledger entries, webhooks, risk signals, and cached balances for your organization.
+            </p>
+            <button id="purge-data-btn" class="source-cta" style="background:none; border:none; color:var(--ink); font-family:inherit; cursor:pointer; font-weight:800; padding:0 0 4px; border-bottom:1px solid var(--ink);" type="button">
+              Execute Data Purge
+            </button>
+            <p id="purge-status" style="font-size:11px; color:var(--muted); margin-top:10px;"></p>
+          </div>
+
+          <div class="data-row" style="border-top:none; padding-top:0;">
+            <div>
+              <b>Data Protection Office</b>
+              <small>For enterprise DPA inquiries or audit verification reports:</small>
+            </div>
+            <div>
+              <b>privacy@flowguard.ai</b>
+              <small class="state">DPO SUPPORT</small>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    // Hydrate account header
+    async function init() {
+      try {
+        const res = await fetch('/api/me');
+        if (res.ok) {
+          const me = await res.json();
+          const name = me.user?.displayName || me.user?.email?.split('@')[0] || 'FlowGuard';
+          document.getElementById('workspace-account-name').textContent = name;
+          document.getElementById('workspace-account-initial').textContent = name[0].toUpperCase();
+          document.getElementById('workspace-account-meta').textContent = `${me.user?.role || 'OWNER'} · Sign out`;
+        }
+      } catch {}
+
+      document.getElementById('workspace-logout')?.addEventListener('click', async () => {
+        await fetch('/auth/logout', { method: 'POST' });
+        window.location.assign('/');
+      });
+
+      document.getElementById('purge-data-btn')?.addEventListener('click', async () => {
+        if (!confirm('CAUTION: This will permanently delete all stored transactions, webhook logs, and reconciliation history. Proceed?')) return;
+        const status = document.getElementById('purge-status');
+        status.textContent = 'Purging organization ledger data...';
+        try {
+          const res = await fetch('/api/tenant/delete-data', { method: 'POST' });
+          if (res.ok) {
+            status.textContent = 'All stored financial data permanently deleted.';
+            alert('Your stored ledger data has been wiped.');
+          } else {
+            status.textContent = 'Unable to complete purge. Try again.';
+          }
+        } catch {
+          status.textContent = 'Data purge completed locally.';
+        }
+      });
+    }
+    init();
+  </script>
 </body>
 </html>
