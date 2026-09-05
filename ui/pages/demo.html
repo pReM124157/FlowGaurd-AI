@@ -7,62 +7,56 @@
   <meta name="description" content="FlowGuard demo sandbox — synthetic financial simulation with explicit isolation." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="../css/design-system.css" />
-  <link rel="stylesheet" href="../css/motion.css" />
   <link rel="stylesheet" href="../css/demo.css" />
 </head>
 <body class="demo-body">
-<div class="bg-mesh" aria-hidden="true"></div>
 
 <aside class="demo-rail" aria-label="Demo navigation">
   <a class="demo-brand" href="/"><span class="demo-brand-mark">◈</span>FlowGuard</a>
   <div class="demo-identity">
-    <div class="demo-identity-badge">DEMO MODE</div>
+    <div class="demo-identity-badge">DEMO SANDBOX</div>
     <div class="demo-identity-org">Acme Corp (Synthetic)</div>
-    <small>Isolated simulation environment</small>
+    <small>Isolated simulation</small>
   </div>
   <nav>
-    <p>OVERVIEW</p>
-    <a class="active" href="#overview"><span>📊</span> Control Center</a>
-    <a href="#cash-flow"><span>💰</span> Cash Position</a>
-    <a href="#forecast"><span>📈</span> Forecast Model</a>
-    <a href="#risk-signals"><span>⚠️</span> Risk Signals</a>
+    <p>CONTROL CENTER</p>
+    <a class="active" href="#overview">Overview</a>
+    <a href="#cash-flow">Cash Position</a>
+    <a href="#forecast">Forecast Model</a>
+    <a href="#risk-signals">Risk Signals</a>
   </nav>
-  <a class="demo-exit" href="/"><span>Exit Demo</span><b>→</b></a>
+  <a class="demo-exit" href="/">Exit demo <b>→</b></a>
 </aside>
 
 <main class="demo-main">
   <header class="demo-topbar" id="demo-banner" role="banner">
     <div class="demo-topbar-pill"><i></i> DEMO SANDBOX</div>
     <div class="demo-topbar-desc">This is an isolated synthetic simulation. All values are marked SIMULATED.</div>
-    <div class="demo-topbar-actions">
-      <a href="/" class="demo-topbar-link">Exit Demo <b>→</b></a>
-    </div>
+    <a href="/" class="demo-exit-btn">Exit Demo <b>→</b></a>
   </header>
 
   <section class="demo-intro" id="overview">
     <div>
       <p class="workspace-index">FLOWGUARD / DEMO / 01</p>
-      <h1>See the system<br>before you connect.</h1>
+      <h1>See the system<br><span class="green-accent">before you connect.</span></h1>
       <p class="intro-subtitle">Acme Corp is a sealed simulation showing how payments, forecast movement, and risk signals are linked.</p>
     </div>
     <div class="demo-sequence" aria-hidden="true">
-      <div class="demo-sequence-label">Simulated Sequence</div>
+      <span class="demo-sequence-kicker">SIMULATION SEQUENCE</span>
       <strong>01</strong>
-      <div class="demo-sequence-track">
-        <div class="demo-sequence-dots">
-          <span></span><span></span><span></span>
-        </div>
+      <div class="demo-sequence-rule"></div>
+      <div class="demo-sequence-markers">
+        <span></span><span></span><span></span>
       </div>
       <div class="demo-sequence-captions">
-        <span>Context</span><span>Sources</span><span>Signals</span>
+        <span>CONTEXT</span><span>SOURCES</span><span>SIGNALS</span>
       </div>
     </div>
   </section>
 
-  <div class="demo-content" id="demo-content">
+  <main class="demo-content" id="demo-content">
     <div class="empty-state"><div class="spinner"></div></div>
-  </div>
+  </main>
 </main>
 
 <script type="module">
@@ -79,13 +73,13 @@ const risks   = tenant?.initialAssessment?.risks ?? [];
 const cur     = profile.currency ?? 'INR';
 
 const chartDays = [
-  { day: 'Mon', h: 0.55, val: '₹14.2L' },
-  { day: 'Tue', h: 0.70, val: '₹16.8L' },
-  { day: 'Wed', h: 0.65, val: '₹15.5L' },
-  { day: 'Thu', h: 0.80, val: '₹18.4L' },
-  { day: 'Fri', h: 0.75, val: '₹17.9L' },
-  { day: 'Sat', h: 0.88, val: '₹19.6L' },
-  { day: 'Sun', h: 1.00, val: '₹21.2L' },
+  { day: 'Mon', h: 0.55, val: '₹14,20,000' },
+  { day: 'Tue', h: 0.70, val: '₹16,80,000' },
+  { day: 'Wed', h: 0.65, val: '₹15,50,000' },
+  { day: 'Thu', h: 0.80, val: '₹18,47,320' },
+  { day: 'Fri', h: 0.75, val: '₹17,90,000' },
+  { day: 'Sat', h: 0.88, val: '₹19,60,000' },
+  { day: 'Sun', h: 1.00, val: '₹21,20,000' },
 ];
 
 document.getElementById('demo-content').innerHTML = `
@@ -101,9 +95,9 @@ document.getElementById('demo-content').innerHTML = `
   </div>
 
   <!-- Notice banner -->
-  <div class="demo-alert-box">
-    <span class="demo-alert-icon">&#x1F52E;</span>
-    <div class="demo-alert-text">All values below are <strong>SIMULATED</strong> &mdash; generated from an isolated synthetic sandbox dataset to showcase FlowGuard&rsquo;s automated detection. Zero connection to real financials.</div>
+  <div class="demo-alert">
+    <span>&#x1F52E;</span>
+    <div>All values below are <strong>SIMULATED</strong> &mdash; generated from an isolated synthetic sandbox dataset to showcase FlowGuard&rsquo;s automated detection. Zero connection to real financials.</div>
   </div>
 
   <!-- KPI row -->
@@ -118,7 +112,7 @@ document.getElementById('demo-content').innerHTML = `
   <div class="grid-2">
     <div class="chart-card" id="cash-flow">
       <div class="chart-header">
-        <div class="chart-title">&#x1F4C8; Cash Flow &middot; 7-Day Simulation</div>
+        <div class="chart-title">Cash Flow &middot; 7-Day Simulation</div>
         <span class="badge badge-simulated">Simulated</span>
       </div>
       <div class="chart-area" aria-label="7-Day Cash Flow Simulation">
@@ -135,7 +129,7 @@ document.getElementById('demo-content').innerHTML = `
     <!-- Risk panel -->
     <div class="chart-card" id="risk-signals">
       <div class="chart-header">
-        <div class="chart-title">&#x26A0;&#xFE0F; Simulated Risk Alerts</div>
+        <div class="chart-title">Simulated Risk Alerts</div>
         <span class="badge badge-simulated">Simulated</span>
       </div>
       <div class="risk-list">
@@ -158,7 +152,7 @@ document.getElementById('demo-content').innerHTML = `
   <!-- Context from demo profile -->
   <div class="chart-card" id="operating-model" style="margin-top:20px">
     <div class="chart-header">
-      <div class="chart-title">&#x1F4CB; Demo Sandbox Profile</div>
+      <div class="chart-title">Demo Sandbox Profile</div>
       <span class="badge badge-simulated">Simulated</span>
     </div>
     <div class="grid-3">
@@ -173,9 +167,9 @@ document.getElementById('demo-content').innerHTML = `
 
   <!-- CTA to start real onboarding -->
   <div class="demo-cta-card">
-    <div class="demo-cta-title">Ready to see your company&rsquo;s real numbers?</div>
-    <div class="demo-cta-desc">Set up FlowGuard with your actual financial data and get deterministic early warnings.</div>
-    <a href="/pages/signup.html" class="demo-cta-btn">&#x1F680; Start With Real Data</a>
+    <h2 class="demo-cta-title">Ready to see your company&rsquo;s real numbers?</h2>
+    <p class="demo-cta-desc">Set up FlowGuard with your actual financial data and get deterministic early warnings.</p>
+    <a href="/pages/signup.html" class="demo-cta-btn">Start With Real Data &rarr;</a>
   </div>
 `;
 
@@ -185,13 +179,13 @@ function renderDemoKpi(label, metric, icon) {
   return `
     <div class="kpi-card">
       <div class="kpi-header">
-        <div class="kpi-label">${icon} ${label}</div>
+        <div class="kpi-label">${label}</div>
         <span class="badge badge-simulated">Simulated</span>
       </div>
       <div class="kpi-value ${isNoData ? 'no-data' : ''}">${formatted}</div>
       <div class="kpi-footer">
-        <div class="kpi-provenance-tag">&#x26A0;&#xFE0F; SIMULATED</div>
-        <div class="kpi-freshness">synthetic</div>
+        <span class="kpi-sim-tag">SIMULATED</span>
+        <span class="kpi-freshness">synthetic</span>
       </div>
     </div>
   `;
