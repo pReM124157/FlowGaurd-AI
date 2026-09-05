@@ -1,5 +1,18 @@
 const $ = (id) => document.getElementById(id);
 async function api(path, options) { const response = await fetch(path, { credentials: "same-origin", ...options }); if (!response.ok) throw new Error("Request failed"); return response.json(); }
+let sessionReady = false;
+async function requireSession() {
+  if (sessionReady) return true;
+  try {
+    await api("/api/me");
+    sessionReady = true;
+    return true;
+  } catch {
+    $("razorpay-status").textContent = "Sign in to FlowGuard before managing a Razorpay connection.";
+    window.setTimeout(() => location.assign("/pages/login.html"), 900);
+    return false;
+  }
+}
 let webhookUrl = `${location.origin}/webhooks/razorpay`;
 async function refreshRazorpayStatus() {
   try {
@@ -19,15 +32,18 @@ async function refreshRazorpayStatus() {
   } catch { $("razorpay-status").textContent = "Unable to read Razorpay connection status."; }
 }
 $("razorpay-connect").onclick = () => {
+  if (!sessionReady) { requireSession(); return; }
   if (!$("razorpay-consent").checked) { $("razorpay-status").textContent = "Confirm consent before connecting Razorpay."; return; }
   location.assign("/api/razorpay/oauth/start");
 };
 $("razorpay-sync").onclick = async () => {
+  if (!(await requireSession())) return;
   $("razorpay-status").textContent = "Syncing Razorpay payments...";
   try { const result = await api("/api/razorpay/oauth/sync", { method: "POST" }); $("razorpay-status").textContent = `${result.ingestedEvents} ledger events imported from ${result.syncedPayments} Razorpay payments.`; }
   catch { $("razorpay-status").textContent = "Sync failed. Reconnect Razorpay or check the server connection status."; }
 };
 $("razorpay-test-payment").onclick = async () => {
+  if (!(await requireSession())) return;
   if (!$("razorpay-consent").checked) { $("razorpay-status").textContent = "Confirm consent before starting a test payment."; return; }
   try {
     $("razorpay-status").textContent = "Creating secure Razorpay test order...";
@@ -49,7 +65,7 @@ $("razorpay-test-payment").onclick = async () => {
   } catch { $("razorpay-status").textContent = "Unable to start the test payment. Confirm Razorpay Test Mode keys are configured in Render."; }
 };
 $("copy-webhook").onclick = async () => { await navigator.clipboard?.writeText(webhookUrl); $("copy-webhook").textContent = "Copied"; };
-refreshRazorpayStatus();
+requireSession().then((authenticated) => { if (authenticated) refreshRazorpayStatus(); });
 
 function loadRazorpayCheckout() {
   if (window.Razorpay) return Promise.resolve();
