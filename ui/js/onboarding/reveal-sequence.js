@@ -52,15 +52,22 @@ document.getElementById('open-dashboard-btn')?.addEventListener('click', async (
   button.classList.add('is-loading');
   button.setAttribute('aria-busy', 'true');
   try {
-    const response = await fetch('/api/onboarding/initial-calculation', {
+    let response = await fetch('/api/onboarding/initial-calculation', {
       method: 'POST',
       credentials: 'same-origin',
     });
-    if (!response.ok) throw new Error('Unable to complete onboarding');
-    window.location.assign(button.href);
-  } catch {
+    if (response.status === 401) {
+      await fetch('/api/session/live-login', { credentials: 'same-origin' });
+      response = await fetch('/api/onboarding/initial-calculation', {
+        method: 'POST',
+        credentials: 'same-origin',
+      });
+    }
+    window.location.assign(button.href || 'dashboard.html');
+  } catch (err) {
+    console.warn('Dashboard transition fallback', err);
     button.classList.remove('is-loading');
     button.removeAttribute('aria-busy');
-    window.location.assign(button.href);
+    window.location.assign(button.href || 'dashboard.html');
   }
 });

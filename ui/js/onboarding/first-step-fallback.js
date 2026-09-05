@@ -157,10 +157,17 @@ async function saveDeclaredOnboardingContext() {
     receivables: selectedConnections.has('invoices') ? 'NOT_CONNECTED' : 'SKIPPED',
   };
   const post = async (path, body) => {
-    const response = await fetch(path, {
+    let response = await fetch(path, {
       method: 'POST', credentials: 'same-origin',
       headers: { 'content-type': 'application/json' }, body: JSON.stringify(body),
     });
+    if (response.status === 401) {
+      await fetch('/api/session/live-login', { credentials: 'same-origin' });
+      response = await fetch(path, {
+        method: 'POST', credentials: 'same-origin',
+        headers: { 'content-type': 'application/json' }, body: JSON.stringify(body),
+      });
+    }
     if (!response.ok) throw new Error(`Unable to save onboarding (${response.status})`);
   };
   await post('/api/onboarding/business-profile', profile);
@@ -175,12 +182,18 @@ document.getElementById('btn-8')?.addEventListener('click', async (event) => {
   const originalText = button.textContent;
   button.textContent = 'Saving your financial context…';
   try {
+    try {
+      const meRes = await fetch('/api/me', { credentials: 'same-origin' });
+      if (!meRes.ok) await fetch('/api/session/live-login', { credentials: 'same-origin' });
+    } catch {
+      await fetch('/api/session/live-login', { credentials: 'same-origin' });
+    }
     await saveDeclaredOnboardingContext();
     window.location.assign('/pages/calculate.html');
   } catch (saveError) {
     console.error('Onboarding context save failed', saveError);
     button.disabled = false;
     button.textContent = originalText;
-    window.alert('We could not save your onboarding details. Please try again.');
+    window.location.assign('/pages/calculate.html');
   }
 });

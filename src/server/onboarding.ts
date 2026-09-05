@@ -131,10 +131,10 @@ export function resetOnboardingForTests(): void {
 
 export function isDashboardReady(organizationId: string, mode: "LIVE" | "DEMO"): boolean {
   const stage = getOnboardingRecord(organizationId).stage;
-  // DATA_VALIDATION is the final persisted questionnaire stage used by earlier
-  // releases. Treat it as complete so existing accounts are not replayed
-  // through calculation/reveal after an upgrade.
-  return mode === "DEMO" || stage === "READY" || stage === "DATA_VALIDATION";
+  // DATA_VALIDATION and INITIAL_CALCULATION are valid progression stages where
+  // the user has declared their context. Treat them as complete so accounts
+  // are never trapped in redirect loops when opening the dashboard overview.
+  return mode === "DEMO" || stage === "READY" || stage === "INITIAL_CALCULATION" || stage === "DATA_VALIDATION";
 }
 
 export function saveBusinessProfile(organizationId: string, input: BusinessProfileInput): OnboardingRecord {

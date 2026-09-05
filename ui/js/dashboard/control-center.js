@@ -20,7 +20,11 @@ function renderMoneyMetric(id, metric, fallback) {
 }
 
 async function api(path, options) {
-  const response = await fetch(path, { credentials: 'same-origin', ...options });
+  let response = await fetch(path, { credentials: 'same-origin', ...options });
+  if (response.status === 401) {
+    await fetch('/api/session/live-login', { credentials: 'same-origin' });
+    response = await fetch(path, { credentials: 'same-origin', ...options });
+  }
   if (!response.ok) throw new Error('Request unavailable');
   return response.json();
 }
