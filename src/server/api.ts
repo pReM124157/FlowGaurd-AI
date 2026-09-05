@@ -522,25 +522,12 @@ async function handleStatic(request: Request, url: URL): Promise<Response> {
   }
   const pathname = url.pathname === "/" ? "/index.html" : url.pathname;
   if (pathname === "/pages/dashboard.html") {
-    let user = await authenticate(request);
-    let cookieToSet: string | undefined;
-    if (!user) {
-      cookieToSet = liveFirstRunCookie();
-      user = { userId: "user_empty", email: "owner@empty.live", organizationId: "org_empty", role: "OWNER" };
-    }
+    const user = await authenticate(request);
+    if (!user) return redirect(`/pages/login.html?next=${encodeURIComponent(pathname)}`);
     ensureOrganization(user.organizationId, user.displayName ?? user.email.split("@")[0]);
     const sessionToken = parseCookieHeader(request.headers.get("cookie") ?? "").fg_supabase_session;
     await restoreSupabaseTenantState(sessionToken, user.organizationId);
-    const root = join(process.cwd(), "ui");
-    const path = join(root, pathname.replace(/^\/+/, ""));
-    try {
-      const content = await readFile(path);
-      const headers: Record<string, string> = { "content-type": contentType(path) };
-      if (cookieToSet) headers["set-cookie"] = cookieToSet;
-      return new Response(content, { headers });
-    } catch {
-      throw Object.assign(new Error("Not found"), { statusCode: 404, code: "FG_NOT_FOUND" });
-    }
+    if (!isDashboardReady(user.organizationId, getOrganizationRuntime(user.organizationId).profile.mode)) return redirect("/pages/onboarding.html");
   }
   const root = join(process.cwd(), "ui");
   const path = join(root, pathname.replace(/^\/+/, ""));
