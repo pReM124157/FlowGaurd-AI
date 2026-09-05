@@ -13,12 +13,12 @@ import { checkRateLimit } from "./rate-limit.ts";
 import { clearOAuthStateCookie, clearSessionCookie, createGoogleAuthorization, finishGoogleAuthorization, invalidateOAuthSession, markOAuthOnboardingComplete, oauthStateCookie, sessionCookie } from "./google-oauth.ts";
 import { clearSupabaseSessionCookie, createSupabaseGoogleAuthorization, exchangeSupabaseGoogleCode, getRazorpayOAuthConnection, getRazorpayOAuthStatus, getSupabaseOnboardingProgress, getSupabaseOnboardingStage, markRazorpayOAuthSynced, provisionSupabaseTenant, saveRazorpayOAuthConnection, saveSupabaseOnboardingProgress, signInWithSupabase, signUpWithSupabase, supabaseAuthConfigured, supabaseServiceConfigured, supabaseSessionCookie } from "./supabase-auth.ts";
 import { buildDeclaredBaseline } from "./declared-baseline.ts";
-import { createOAuthState, createRazorpayAuthorizationUrl, exchangeRazorpayAuthorizationCode, fetchRazorpayOAuthPayments, fetchRazorpayPayments, paymentsToCanonicalEvents, razorpayConfig, razorpayDirectConfig, verifyRazorpayWebhook, webhookOrganizationId, webhookToCanonicalEvents, type RazorpayWebhook } from "./razorpay-live.ts";
+import { createOAuthState, createRazorpayAuthorizationUrl, createRazorpayTestOrder, exchangeRazorpayAuthorizationCode, fetchRazorpayOAuthPayments, fetchRazorpayPayments, paymentsToCanonicalEvents, razorpayConfig, razorpayDirectConfig, verifyRazorpayWebhook, webhookOrganizationId, webhookToCanonicalEvents, type RazorpayWebhook } from "./razorpay-live.ts";
 
 type JsonValue = null | string | number | boolean | JsonValue[] | { [key: string]: JsonValue };
 
 const SECURITY_HEADERS = {
-  "content-security-policy": "default-src 'self'; style-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'",
+  "content-security-policy": "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://checkout.razorpay.com; img-src 'self' data:; connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com; frame-ancestors 'none'",
   "x-content-type-options": "nosniff",
   "referrer-policy": "strict-origin-when-cross-origin",
   "x-frame-options": "DENY",
@@ -235,7 +235,7 @@ async function handleApi(request: Request, url: URL, correlationId: string): Pro
       requirePermission(user, "view_settings");
       const config = razorpayConfig();
       const connection = await getRazorpayOAuthStatus(user.organizationId);
-      return json({ configured: Boolean(config && supabaseServiceConfigured()), connected: connection.connected, accountId: connection.accountId, connectedAt: connection.connectedAt, lastSyncedAt: connection.lastSyncedAt, webhookUrl: `${url.origin}/webhooks/razorpay`, webhookReady: url.protocol === "https:" });
+      return json({ configured: Boolean(config && supabaseServiceConfigured()), testModeConfigured: Boolean(razorpayDirectConfig()), connected: connection.connected, accountId: connection.accountId, connectedAt: connection.connectedAt, lastSyncedAt: connection.lastSyncedAt, webhookUrl: `${url.origin}/webhooks/razorpay`, webhookReady: url.protocol === "https:" });
     }
     case "GET /api/razorpay/oauth/start": {
       requirePermission(user, "view_settings");
@@ -257,6 +257,15 @@ async function handleApi(request: Request, url: URL, correlationId: string): Pro
       await markRazorpayOAuthSynced(user.organizationId);
       recordAuditEvent(user, "razorpay_oauth_sync", "RazorpayConnection", connection.accountId, correlationId);
       return json({ dataLabel: updated.dataLabel, syncedPayments: payments.length, ingestedEvents: events.length, cash: updated.cash, alerts: updated.alerts, timeline: updated.timeline });
+    }
+    case "POST /api/razorpay/test-checkout": {
+      requirePermission(user, "view_settings");
+      checkRateLimit(`razorpay-test-order:${user.userId}`, 5, 60_000);
+      const config = razorpayDirectConfig();
+      if (!config) throw Object.assign(new Error("Razorpay Test Mode is not configured"), { statusCode: 503, code: "FG_RAZORPAY_UNAVAILABLE" });
+      const order = await createRazorpayTestOrder(config, { organizationId: user.organizationId, amountMinor: 10_000 });
+      recordAuditEvent(user, "razorpay_test_order_created", "RazorpayOrder", order.id, correlationId);
+      return json({ keyId: config.keyId, orderId: order.id, amountMinor: order.amountMinor, currency: order.currency, organizationId: user.organizationId });
     }
     case "GET /api/me":
       recordAuditEvent(user, "session_resolved", "User", user.userId, correlationId);

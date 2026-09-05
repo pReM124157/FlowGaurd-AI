@@ -11,6 +11,7 @@ export type RazorpayConnectionConfig = Readonly<{
 
 export type RazorpayDirectConfig = Readonly<{ keyId: string; keySecret: string }>;
 export type RazorpayOAuthToken = Readonly<{ accessToken: string; refreshToken: string; accessTokenExpiresAt: string; refreshTokenExpiresAt?: string; accountId: string }>;
+export type RazorpayOrder = Readonly<{ id: string; amountMinor: number; currency: string }>;
 
 type RazorpayEntity = Record<string, unknown>;
 export type RazorpayWebhook = Readonly<{ event?: unknown; payload?: unknown; created_at?: unknown }>;
@@ -40,6 +41,30 @@ export async function fetchRazorpayPayments(config: RazorpayDirectConfig): Promi
   if (!response.ok) throw Object.assign(new Error("Razorpay payments sync failed"), { statusCode: 502, code: "FG_RAZORPAY_SYNC_FAILED" });
   const payload = await response.json() as { items?: unknown };
   return Array.isArray(payload.items) ? payload.items.filter(isRecord) : [];
+}
+
+/** Creates a Test Mode order server-side so the browser receives only the public key id. */
+export async function createRazorpayTestOrder(config: RazorpayDirectConfig, input: { organizationId: string; amountMinor: number }): Promise<RazorpayOrder> {
+  const authorization = Buffer.from(`${config.keyId}:${config.keySecret}`).toString("base64");
+  const response = await fetch("https://api.razorpay.com/v1/orders", {
+    method: "POST",
+    headers: { authorization: `Basic ${authorization}`, "content-type": "application/json" },
+    body: JSON.stringify({
+      amount: input.amountMinor,
+      currency: "INR",
+      receipt: `fg_${input.organizationId.slice(-12)}_${Date.now().toString(36)}`.slice(0, 40),
+      notes: { flowguard_organization_id: input.organizationId, flowguard_source: "test_checkout" },
+    }),
+    signal: AbortSignal.timeout(10_000),
+  });
+  const payload = await response.json().catch(() => ({})) as Record<string, unknown>;
+  const id = typeof payload.id === "string" ? payload.id : "";
+  const amountMinor = integer(payload, "amount");
+  const currency = string(payload, "currency") ?? "";
+  if (!response.ok || !id || amountMinor !== input.amountMinor || currency !== "INR") {
+    throw Object.assign(new Error("Razorpay test order creation failed"), { statusCode: 502, code: "FG_RAZORPAY_ORDER_FAILED" });
+  }
+  return Object.freeze({ id, amountMinor, currency });
 }
 
 export function paymentsToCanonicalEvents(organizationId: string, payments: RazorpayEntity[]): CanonicalEvent[] {
@@ -162,7 +187,7 @@ export function webhookToCanonicalEvents(organizationId: string, webhookEventId:
  * to another tenant.
  */
 export function webhookOrganizationId(raw: RazorpayWebhook): string | undefined {
-  for (const key of ["payment", "refund"]) {
+  for (const key of ["payment", "refund", "order"]) {
     const notes = entity(raw, key).notes;
     if (!isRecord(notes)) continue;
     const organizationId = notes.flowguard_organization_id;

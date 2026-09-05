@@ -33,6 +33,7 @@ describe("Razorpay live ingestion boundary", () => {
 
   it("only resolves a tenant from FlowGuard-owned Razorpay notes", () => {
     assert.equal(webhookOrganizationId({ payload: { payment: { entity: { notes: { flowguard_organization_id: "org_safe_tenant" } } } } }), "org_safe_tenant");
+    assert.equal(webhookOrganizationId({ payload: { order: { entity: { notes: { flowguard_organization_id: "org_safe_order" } } } } }), "org_safe_order");
     assert.equal(webhookOrganizationId({ payload: { payment: { entity: { notes: { organization_id: "org_other" } } } } }), undefined);
   });
 
