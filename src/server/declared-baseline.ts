@@ -65,11 +65,11 @@ export function buildDeclaredBaseline(record: OnboardingRecord): DeclaredFinanci
 function recurringObligations(profile: BusinessProfileInput): number {
   // Payroll is stored separately. Exclude a mirrored payroll record so the
   // same declared commitment is never counted twice.
-  const recurring = profile.recurringObligations
-    .filter((item) => item.label.trim().toLowerCase() !== "payroll")
-    .reduce((total, item) => total + monthlyAmount(item.amountMinor, item.cadence), 0);
-  const financing = profile.financingObligations.reduce((total, item) => total + monthlyAmount(item.amountMinor, item.cadence), 0);
-  return monthlyAmount(profile.payrollAmountMinor, profile.payrollSchedule) + recurring + financing;
+  const recurring = (profile.recurringObligations ?? [])
+    .filter((item) => item && typeof item.label === "string" && item.label.trim().toLowerCase() !== "payroll")
+    .reduce((total, item) => total + monthlyAmount(item.amountMinor || 0, item.cadence || "monthly"), 0);
+  const financing = (profile.financingObligations ?? []).reduce((total, item) => total + monthlyAmount(item.amountMinor || 0, item.cadence || "monthly"), 0);
+  return monthlyAmount(profile.payrollAmountMinor || 0, profile.payrollSchedule || "monthly") + recurring + financing;
 }
 
 /** Converts declared recurrence amounts into a conservative 30-day equivalent. */

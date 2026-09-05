@@ -80,7 +80,10 @@
         <label>Customer payment terms (days)<input id="edit-terms" type="number" min="0" required></label>
       </div>
       <p class="financial-input-status" id="financial-input-status"></p>
-      <button class="financial-save" type="submit">Save and recalculate</button>
+      <div style="display:flex;gap:10px;margin-top:14px;align-items:center;">
+        <button class="financial-save" type="submit">Save and recalculate</button>
+        <button type="button" id="fill-example-inputs" style="background:#f4f0e7;color:#111310;border:1px solid #d5cebf;padding:12px 18px;border-radius:4px;font-family:inherit;font-size:0.875rem;font-weight:600;cursor:pointer;">Fill sample numbers</button>
+      </div>
     </form>
   </dialog>
   <script src="../js/dashboard/control-center.js"></script>

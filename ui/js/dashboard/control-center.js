@@ -157,31 +157,54 @@ byId('account-dialog-close').addEventListener('click', () => accountDialog.close
 document.addEventListener('click', (event) => { if (!event.target.closest('.account-control')) closeAccountMenu(); });
 byId('logout-button').addEventListener('click', async () => { await fetch('/auth/logout', { method: 'POST', credentials: 'same-origin' }); window.location.assign('/'); });
 const financialInputDialog = byId('financial-input-dialog');
-function rupeesToMinor(value) { const amount = Number(String(value).replace(/[^0-9.-]/g, '')); return Number.isFinite(amount) ? Math.round(Math.max(0, amount) * 100) : undefined; }
+function rupeesToMinor(value) {
+  if (value === null || value === undefined) return undefined;
+  const clean = String(value).trim().replace(/[^0-9.-]/g, '');
+  if (!clean) return undefined;
+  const amount = Number(clean);
+  return Number.isFinite(amount) ? Math.round(Math.max(0, amount) * 100) : undefined;
+}
 function minorToRupees(value) { return Number.isSafeInteger(value) ? String(value / 100) : ''; }
 byId('edit-financial-inputs').addEventListener('click', () => {
-  byId('edit-organization-name').value = savedBusinessProfile.organizationName || '';
-  byId('edit-industry').value = savedBusinessProfile.industryType || '';
-  byId('edit-current-cash').value = minorToRupees(savedBusinessProfile.currentCashMinor);
-  byId('edit-payroll').value = minorToRupees(savedBusinessProfile.payrollAmountMinor);
-  byId('edit-buffer').value = minorToRupees(savedBusinessProfile.minimumLiquidityBufferMinor);
-  byId('edit-terms').value = savedBusinessProfile.receivableTermsDays ?? 0;
+  byId('edit-organization-name').value = savedBusinessProfile?.organizationName || '';
+  byId('edit-industry').value = savedBusinessProfile?.industryType || '';
+  byId('edit-current-cash').value = minorToRupees(savedBusinessProfile?.currentCashMinor);
+  byId('edit-payroll').value = minorToRupees(savedBusinessProfile?.payrollAmountMinor);
+  byId('edit-buffer').value = minorToRupees(savedBusinessProfile?.minimumLiquidityBufferMinor);
+  byId('edit-terms').value = savedBusinessProfile?.receivableTermsDays ?? 30;
   byId('financial-input-status').textContent = '';
   financialInputDialog.showModal();
+});
+byId('fill-example-inputs')?.addEventListener('click', () => {
+  byId('edit-organization-name').value = 'FlowGuard Enterprise';
+  byId('edit-industry').value = 'E-commerce';
+  byId('edit-current-cash').value = '1250000';
+  byId('edit-payroll').value = '250000';
+  byId('edit-buffer').value = '300000';
+  byId('edit-terms').value = '30';
+  byId('financial-input-status').textContent = 'Sample data loaded. Click "Save and recalculate" below.';
 });
 byId('financial-input-close').addEventListener('click', () => financialInputDialog.close());
 byId('financial-input-form').addEventListener('submit', async (event) => {
   event.preventDefault();
-  if (!savedBusinessProfile) return;
   const currentCashMinor = rupeesToMinor(byId('edit-current-cash').value);
+  const payrollMinor = rupeesToMinor(byId('edit-payroll').value) ?? 0;
+  const bufferMinor = rupeesToMinor(byId('edit-buffer').value) ?? 0;
   const payload = {
-    ...savedBusinessProfile,
-    organizationName: byId('edit-organization-name').value.trim(),
-    industryType: byId('edit-industry').value.trim(),
-    ...(currentCashMinor === undefined ? { currentCashMinor: undefined } : { currentCashMinor }),
-    payrollAmountMinor: rupeesToMinor(byId('edit-payroll').value) ?? 0,
-    minimumLiquidityBufferMinor: rupeesToMinor(byId('edit-buffer').value) ?? 0,
-    receivableTermsDays: Number(byId('edit-terms').value),
+    organizationName: byId('edit-organization-name').value.trim() || 'My Business',
+    industryType: byId('edit-industry').value.trim() || 'General',
+    timezone: savedBusinessProfile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata',
+    currency: 'INR',
+    ...(currentCashMinor !== undefined ? { currentCashMinor } : {}),
+    payrollAmountMinor: payrollMinor,
+    payrollSchedule: savedBusinessProfile?.payrollSchedule || 'monthly',
+    minimumLiquidityBufferMinor: bufferMinor,
+    receivableTermsDays: Number(byId('edit-terms').value) || 30,
+    recurringObligations: [
+      ...(payrollMinor ? [{ label: 'Payroll', amountMinor: payrollMinor, cadence: 'monthly' }] : []),
+    ],
+    financingObligations: savedBusinessProfile?.financingObligations || [],
+    notificationPreferences: savedBusinessProfile?.notificationPreferences || { inAppEnabled: true, emailEnabled: true, minimumSeverity: 'WARNING' },
   };
   const status = byId('financial-input-status');
   status.textContent = 'Saving declared inputs and recalculating...';
@@ -191,7 +214,10 @@ byId('financial-input-form').addEventListener('submit', async (event) => {
     financialInputDialog.close();
     await hydrateControlCenter();
     await askFlowGuard('Summarize my updated financial inputs, identify the most important financial risk, and state the next action needed to improve confidence.', { automatic: true });
-  } catch { status.textContent = 'Unable to save these inputs. Check each value and try again.'; }
+  } catch (err) {
+    console.error('Save financial inputs failed', err);
+    status.textContent = 'Unable to save these inputs. Check each value and try again.';
+  }
 });
 async function initializeControlCenter() {
   await hydrateControlCenter();
