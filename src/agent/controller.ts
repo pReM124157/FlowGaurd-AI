@@ -58,7 +58,7 @@ export function answerFinanceQuestion(state: LedgerState, organizationId: string
       expectedReceivables: { amountMinor: number };
     };
     return {
-      answer: `Your connected ledger shows ${formatMinorUnits(cash.actualBankCash.amountMinor)} in bank cash, ` +
+      answer: `Calculated from ledger tools: Your connected ledger shows ${formatMinorUnits(cash.actualBankCash.amountMinor)} in bank cash, ` +
         `${formatMinorUnits(cash.pendingSettlements.amountMinor)} in pending settlements, and ` +
         `${formatMinorUnits(cash.expectedReceivables.amountMinor)} in expected receivables.`,
       intent,

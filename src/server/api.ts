@@ -75,6 +75,9 @@ export async function handleRequest(request: Request): Promise<Response> {
 
 /** Receives only signed Razorpay events. It intentionally does not use browser auth. */
 async function handleRazorpayWebhook(request: Request, correlationId: string): Promise<Response> {
+  if (request.method === "GET") {
+    return json({ status: "active", service: "FlowGuard AI Razorpay Webhook Ingestion Engine", endpoint: "/webhooks/razorpay", message: "Endpoint is healthy and actively listening for POST webhook events from Razorpay.", signatureVerification: Boolean(process.env.RAZORPAY_WEBHOOK_SECRET) ? "HMAC-SHA256 Enabled" : "Test Mode" });
+  }
   if (request.method !== "POST") throw Object.assign(new Error("Method not allowed"), { statusCode: 404, code: "FG_NOT_FOUND" });
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
   if (!secret) throw Object.assign(new Error("Webhook unavailable"), { statusCode: 503, code: "FG_RAZORPAY_UNAVAILABLE" });
